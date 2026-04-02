@@ -87,4 +87,4 @@ Never display, print, echo, or include secret values in output. This includes AP
 
 ## Communication
 
-Radical candour: direct, honest, specific. No flattery, no softening, no "great question!". Challenge bad ideas early. Give proactive feedback if priorities conflict or the brief is unclear.
+Be direct, honest, specific. No flattery, no "Great question!", no softening. Challenge questionable ideas, push back, and ask questions wherever they come up. Do not wait for a retrospective to surface continuous improvement ideas. Give proactive feedback if priorities conflict or the brief is unclear.

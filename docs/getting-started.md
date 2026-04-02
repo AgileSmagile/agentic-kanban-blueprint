@@ -70,18 +70,19 @@ BOARD_ID=4
 
 CLAUDE.md is the file that tells Claude Code how to behave for your project. It's read automatically when Claude Code starts in a directory that contains it. (If you're using a different AI tool, adapt this to whatever custom instructions mechanism it supports.)
 
-Copy `orchestrator/CLAUDE.md` to the root of your project folder.
+**You need one in every project directory, not just the orchestrator.** This is a common mistake. If a sub-agent is dispatched to a project directory that has no CLAUDE.md (or a thin one), it starts without knowing how to access the board, where secrets live, or how to communicate. It either wastes time asking or gets things wrong.
 
-Adapt it:
-- Replace project paths with yours
-- Set your own brand or style rules (or remove them)
-- Point to your board CLI location
-- Set your secrets policy (the "never display secrets" rule is non-negotiable)
+Copy `orchestrator/CLAUDE.md` to the root of your orchestrator workspace. For each project directory, use the template in the agent-guidelines.md (under "Project CLAUDE.md template") to create a project-specific version.
 
-The key sections to keep:
-- **On startup** (check the board, review what's in progress, brief you)
-- **Secrets policy** (never display passwords, API keys, or tokens)
-- **Communication standards** (direct, honest, no flattery)
+**Every project CLAUDE.md must include:**
+- **Agent operating model** — pointer to agent-guidelines.md with specific areas listed
+- **Key commands** — board CLI commands and infrastructure access. Agents can't use tools they don't know exist.
+- **Communication** — standalone section: "Be direct, honest, specific. No flattery. Challenge questionable ideas, push back, and ask questions wherever they come up. Do not wait for a retrospective to surface continuous improvement ideas."
+- **Secrets policy** — standalone section, not a pointer. How secrets are managed, what agents must never do with values.
+- **Domain knowledge** — which knowledge domains are relevant to this project
+- **Hosting and deployment** — where it runs, how it's deployed, environment separation
+
+The communication and secrets sections are standalone (not just pointers to the guidelines) because they're too important to risk a sub-agent missing. A few lines of duplication is cheaper than leaked secrets or sycophantic output.
 
 ## Step 3: Write the agent guidelines
 

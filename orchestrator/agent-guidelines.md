@@ -283,6 +283,78 @@ An agent that reads domain knowledge before starting makes better decisions. An 
 | Website Agent | `projects/your-website` | Website and admin tooling |
 | Research Agent | No codebase | Planning, analysis, and research |
 
+### Every project needs a CLAUDE.md
+
+Sub-agents are dispatched to project directories. If that project's CLAUDE.md is thin or missing, the sub-agent starts without foundational context: it won't know how to access the board, where secrets live, or what communication standards to follow. It will either ask (wasting time) or guess (getting it wrong).
+
+**Every project CLAUDE.md must include these sections**, even if some just point back to the orchestrator's agent-guidelines.md:
+
+1. **Agent operating model** — pointer to agent-guidelines.md with the specific areas it covers (board workflow, CI/CD, autonomy boundaries, communication, knowledge system)
+2. **Key commands** — board CLI commands and infrastructure access (SSH, secrets manager). Agents can't use tools they don't know exist.
+3. **Secrets policy** — how secrets are managed, how new secrets get added, what agents must never do with values. Not a pointer; a standalone section.
+4. **Communication** — standalone section: "Be direct, honest, specific. No flattery. Challenge questionable ideas, push back, and ask questions wherever they come up. Do not wait for a retrospective to surface continuous improvement ideas."
+5. **Domain knowledge** — pointer to the knowledge system, listing which domains are relevant to this project
+6. **Hosting and deployment** — where the project runs, how it's deployed, environment separation (dev vs production)
+
+See `workspace/CLAUDE.md` in this repo for a worked example of a sub-agent configuration. A full project template follows below.
+
+### Project CLAUDE.md template
+
+```markdown
+# [Project Name] — Project Instructions
+
+## Agent operating model
+
+This project is worked on by the [name] sub-agent, dispatched from the orchestrator.
+Follow `[path to agent-guidelines.md]` for:
+- Board workflow (card lifecycle, WIP limits)
+- CI/CD practices (pre-commit checks, branch strategy, atomic commits, tests)
+- Autonomy boundaries (what requires confirmation vs. proceed autonomously)
+- Communication standards (radical candour, no flattery)
+- Knowledge system (read before starting, write to inbox after completing)
+
+Key commands (run from the orchestrator workspace):
+- Look up cards: `board-cli card <id>`, `board-cli cards`
+- Check WIP: `board-cli wip-age`
+- Move cards: `board-cli move <id> <column_id>`
+- Add comments: `board-cli comment <id> "text"`
+
+## Communication
+
+Be direct, honest, specific. No flattery, no "Great question!", no softening.
+Challenge questionable ideas, push back, and ask questions wherever they come up.
+Do not wait for a retrospective to surface continuous improvement ideas.
+
+## Secrets policy
+
+Environment variables are never stored in .env files as the source of truth.
+The process for a new secret:
+1. PO stores the value in the secrets manager
+2. PO advises the agent of the variable name and format
+3. PO adds it to CI/CD secrets (for pipelines)
+
+The agent handles applying it to the running environment. Document new variables
+in `.env.example` (name and purpose only, never values). Never ask for, store,
+display, or commit actual secret values. Reference variables by name only.
+
+## Domain knowledge
+
+Before starting any card, check `knowledge/INDEX.md` for relevant domains.
+Relevant domains for this project: [list them]
+
+## Hosting and deployment
+
+- **Host**: [where it runs]
+- **Domain**: [if applicable]
+- **Deploy**: [how deployments work]
+- **Environments**: [dev/staging/production separation]
+- **CI/CD**: [what runs on PRs]
+
+## [Project-specific sections below]
+```
+
+The communication and secrets sections are **not pointers**; they're standalone. This is deliberate. If a sub-agent doesn't read the agent-guidelines.md (or loses it from context), these two sections are too important to be missing. The cost of duplication is a few lines of text. The cost of omission is leaked secrets or sycophantic output.
+
 ## Key References
 
 - Plans: `plans/`
