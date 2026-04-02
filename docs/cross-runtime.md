@@ -33,22 +33,39 @@ Both runtimes read the same files. Both interact with the same Kanban board. Bot
 | Component | Runtime | Why |
 |-----------|---------|-----|
 | **CLAUDE.md** | Claude Code | Claude Code reads this file automatically on startup. OpenClaw agents load their context differently. |
+| **File naming conventions** | Both (differently) | Claude Code auto-loads `CLAUDE.md` (uppercase). OpenClaw auto-loads uppercase files like `SOUL.md` and `AGENTS.md`. See naming note below. |
 | **Tool permissions** | Claude Code | Claude Code has its own permission model (allow/deny tools). OpenClaw uses a different access control layer. |
 | **Discord integration** | OpenClaw | Channel bindings, bot tokens, message formatting are Discord-specific. |
 | **File system access** | Claude Code | Direct read/write. OpenClaw agents access files through their gateway. |
+
+### File naming: uppercase matters for auto-loading
+
+Both Claude Code and OpenClaw auto-load specific files on startup, but each has its own conventions:
+
+- **Claude Code** auto-loads `CLAUDE.md` (must be uppercase) from the project root and parent directories.
+- **OpenClaw** auto-loads uppercase files from the agent workspace: `SOUL.md`, `AGENTS.md`, and similar uppercase-named config files. Lowercase variants (`soul.md`, `instructions.md`) are **not** auto-loaded; they must be explicitly referenced in the agent configuration.
+
+If you want a persona file to be picked up automatically by OpenClaw, name it `SOUL.md` (uppercase). If you're loading it explicitly via config, the case doesn't matter. This repo uses lowercase filenames (`soul.md`, `instructions.md`) for readability and portability; rename to uppercase if your runtime requires it for auto-loading.
+
+**Practical recommendation:** if you're running both runtimes against the same workspace, you can either:
+- Use uppercase filenames and let both runtimes find what they need automatically
+- Use lowercase filenames and explicitly configure paths in each runtime's config
+- Use both: `CLAUDE.md` for Claude Code (it ignores `SOUL.md`), `SOUL.md` for OpenClaw (it ignores `CLAUDE.md`)
+
+There's no conflict. Each runtime looks for its own files and ignores the others.
 
 ## How it works in practice
 
 ### Startup
 
 **Claude Code agent:**
-1. Reads CLAUDE.md (automatic)
+1. Reads `CLAUDE.md` (auto-loaded, must be uppercase)
 2. Reads agent-guidelines.md (instructed in CLAUDE.md)
 3. Reads knowledge/INDEX.md, then relevant domain rules
 4. Checks the board via `board-cli`
 
 **OpenClaw agent:**
-1. Loads soul.md and instructions.md (configured in OpenClaw)
+1. Loads `SOUL.md` (auto-loaded if uppercase) or soul.md (if explicitly configured)
 2. The soul file includes the operating model principles
 3. Reads knowledge system files from the shared workspace
 4. Checks the board via `board-cli` (same CLI, same board)

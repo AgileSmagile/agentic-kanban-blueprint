@@ -107,6 +107,12 @@ If you only have one agent, you don't need separate persona files; CLAUDE.md is 
 
 Copy from `personas/` and adapt the role, responsibilities, and constraints.
 
+**File naming matters for auto-loading.** Different runtimes auto-load different files:
+- **Claude Code** auto-loads `CLAUDE.md` (uppercase) from the project root
+- **OpenClaw** auto-loads uppercase files like `SOUL.md` and `AGENTS.md` from the agent workspace; lowercase `soul.md` and `instructions.md` are not auto-loaded and must be referenced explicitly in config
+
+This repo uses lowercase filenames for readability. If your runtime requires uppercase for auto-loading, rename accordingly. See [cross-runtime.md](cross-runtime.md) for more detail.
+
 ## What to tune after your first 10 sessions
 
 - **WIP limits.** Too high = too many things in flight, nothing finishing. Too low = agents idle waiting for capacity. Adjust based on observed throughput.
