@@ -1,0 +1,7 @@
+.env
+.env.local
+.board-agent-actions
+node_modules/
+knowledge/inbox/processed/
+plans/
+tmp/

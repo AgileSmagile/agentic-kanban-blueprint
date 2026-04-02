@@ -1,0 +1,234 @@
+#!/usr/bin/env bash
+# Kanban board CLI helper for agent use
+# Wraps a Kanban board REST API so agents can interact with the board from the terminal.
+#
+# This example targets the Businessmap (Kanbanize) API. Adapt the endpoints, payload
+# shapes, and column IDs for your own board tool.
+#
+# Usage: board-cli <command> [args]
+#
+# Commands:
+#   boards                          List all boards
+#   cards [board_id]                List cards (default: board 4)
+#   card <card_id>                  Get card details
+#   create <title> [col] [lane] [wf] [parent]  Create card. If parent given, prefixes title with [#parent]
+#   move <card_id> <column_id>      Move card to column
+#   block <card_id> <reason>        Block card in place with reason (+ adds comment)
+#   unblock <card_id> <reason>      Unblock card with reason (+ adds comment)
+#   comment <card_id> <text>        Add comment to card
+#   comments <card_id>              List comments on card
+#   update <card_id> <field> <val>  Update card field (title, description, color, etc.)
+#   wip-age                         Show WIP age for all in-flight items
+#   columns [board_id]              List columns (default: board 4)
+#   lanes [board_id]                List lanes (default: board 4)
+#
+# Column Reference (adapt to your board):
+#   Cards workflow:
+#     BACKLOG_COL      Backlog
+#     EVAL_COL         For Evaluation
+#     READY_COL        Ready
+#     IP_COL           In Progress (parent)
+#       DOING_COL        Doing (sub-col, WIP 4)
+#       DONE_COL         Done (sub-col, WIP 2) -- waiting for PO review
+#     VR_COL           Validation / Rework (WIP 3)
+#     SHIPPED_COL      Shipped/Live
+#     CLOSED_COL       Closed
+#     ARCHIVE_COL      Archive
+#
+#   Initiatives workflow:
+#     Backlog → Later → Next → Qualifying → Now → Needs Follow-up → Done → Archive
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ENV_FILE="$SCRIPT_DIR/../../.env"
+
+if [[ -f "$ENV_FILE" ]]; then
+  source "$ENV_FILE"
+fi
+
+: "${BOARD_API_KEY:?Set BOARD_API_KEY in .env}"
+: "${BOARD_BASE_URL:?Set BOARD_BASE_URL in .env (e.g. https://yourorg.kanbanize.com/api/v2)}"
+: "${BOARD_ID:=4}"
+
+API="$BOARD_BASE_URL"
+AUTH="apikey: $BOARD_API_KEY"
+
+# --- Column IDs (adapt to your board) ---
+BACKLOG_COL="${BACKLOG_COL:-29}"
+DOING_COL="${DOING_COL:-150}"
+DONE_COL="${DONE_COL:-151}"
+VR_COL="${VR_COL:-31}"
+SHIPPED_COL="${SHIPPED_COL:-42}"
+DEFAULT_LANE="${DEFAULT_LANE:-6}"
+DEFAULT_WF="${DEFAULT_WF:-6}"
+
+# Wrapper for curl that checks HTTP status codes.
+board_curl() {
+  local response http_code
+  response=$(curl -s -w "\n%{http_code}" "$@")
+  http_code=$(echo "$response" | tail -1)
+  response=$(echo "$response" | sed '$d')
+  if [[ "$http_code" -lt 200 || "$http_code" -ge 300 ]]; then
+    echo "Error: HTTP $http_code from API" >&2
+    echo "$response" >&2
+    return 1
+  fi
+  echo "$response"
+}
+
+# Record agent actions (used by board-watcher to filter self-noise)
+AGENT_ACTIONS_FILE="$SCRIPT_DIR/../../.board-agent-actions"
+
+record_agent_action() {
+  local card_id="$1" action="$2"
+  local ts
+  ts=$(date +%s)
+  echo "${card_id}|${action}|${ts}" >> "$AGENT_ACTIONS_FILE"
+  # Prune entries older than 5 minutes
+  if [[ -f "$AGENT_ACTIONS_FILE" ]]; then
+    local cutoff=$((ts - 300))
+    local tmp="${AGENT_ACTIONS_FILE}.tmp"
+    awk -F'|' -v cutoff="$cutoff" '$3 >= cutoff' "$AGENT_ACTIONS_FILE" > "$tmp" 2>/dev/null || true
+    mv "$tmp" "$AGENT_ACTIONS_FILE" 2>/dev/null || true
+  fi
+  # Optional: push to an event webhook (fire-and-forget)
+  # curl -s --max-time 3 -X POST \
+  #   -H "Content-Type: application/json" \
+  #   -d "{\"card_id\":\"${card_id}\",\"action\":\"${action}\",\"ts\":\"${ts}\"}" \
+  #   "$WEBHOOK_URL" > /dev/null 2>&1 &
+}
+
+cmd="${1:-help}"
+shift || true
+
+case "$cmd" in
+  boards)
+    board_curl -H "$AUTH" "$API/boards"
+    ;;
+
+  cards)
+    board_id="${1:-$BOARD_ID}"
+    board_curl -H "$AUTH" "$API/cards?board_ids=$board_id&per_page=100"
+    ;;
+
+  card)
+    card_id="${1:?Usage: board-cli card <card_id>}"
+    board_curl -H "$AUTH" "$API/cards/$card_id"
+    ;;
+
+  delete)
+    card_id="${1:?Usage: board-cli delete <card_id>}"
+    record_agent_action "$card_id" "delete"
+    board_curl -X DELETE -H "$AUTH" "$API/cards/$card_id"
+    ;;
+
+  create)
+    title="${1:?Usage: board-cli create <title> [column_id] [lane_id] [workflow_id] [parent_card_id]}"
+    column_id="${2:-$BACKLOG_COL}"
+    lane_id="${3:-$DEFAULT_LANE}"
+    workflow_id="${4:-$DEFAULT_WF}"
+    parent_id="${5:-}"
+    # Prefix title with [#parent] if parent initiative provided
+    if [[ -n "$parent_id" ]]; then
+      title="[#$parent_id] $title"
+    fi
+    payload=$(node "$SCRIPT_DIR/../../lib/board-cli-helpers.js" makeCardPayload "$workflow_id" "$column_id" "$lane_id" "$title")
+    result=$(board_curl -X POST -H "$AUTH" -H "Content-Type: application/json" \
+      "$API/cards" \
+      --data-raw "$payload")
+    created_id=$(echo "$result" | node "$SCRIPT_DIR/../../lib/board-cli-helpers.js" extractCardId 2>/dev/null || echo "")
+    if [[ -n "$created_id" ]]; then
+      record_agent_action "$created_id" "create"
+    fi
+    echo "$result"
+    ;;
+
+  move)
+    card_id="${1:?Usage: board-cli move <card_id> <column_id>}"
+    column_id="${2:?Usage: board-cli move <card_id> <column_id>}"
+    record_agent_action "$card_id" "move"
+    board_curl -X PATCH -H "$AUTH" -H "Content-Type: application/json" \
+      "$API/cards/$card_id" \
+      -d "{\"column_id\":$column_id}"
+    ;;
+
+  block)
+    card_id="${1:?Usage: board-cli block <card_id> <reason>}"
+    reason="${2:?Usage: board-cli block <card_id> <reason>}"
+    record_agent_action "$card_id" "block"
+    block_payload=$(node "$SCRIPT_DIR/../../lib/board-cli-helpers.js" makeBlockPayload "$reason")
+    board_curl -X PATCH -H "$AUTH" -H "Content-Type: application/json" \
+      "$API/cards/$card_id" \
+      --data-raw "$block_payload"
+    # Also add a comment for audit trail
+    block_comment=$(node "$SCRIPT_DIR/../../lib/board-cli-helpers.js" makeCommentPayload "BLOCKED: $reason")
+    board_curl -X POST -H "$AUTH" -H "Content-Type: application/json" \
+      "$API/cards/$card_id/comments" \
+      --data-raw "$block_comment" > /dev/null
+    ;;
+
+  unblock)
+    card_id="${1:?Usage: board-cli unblock <card_id> <reason>}"
+    reason="${2:?Usage: board-cli unblock <card_id> <reason>}"
+    record_agent_action "$card_id" "unblock"
+    board_curl -X PATCH -H "$AUTH" -H "Content-Type: application/json" \
+      "$API/cards/$card_id" \
+      -d '{"is_blocked":0,"block_reason":null}'
+    unblock_comment=$(node "$SCRIPT_DIR/../../lib/board-cli-helpers.js" makeCommentPayload "UNBLOCKED: $reason")
+    board_curl -X POST -H "$AUTH" -H "Content-Type: application/json" \
+      "$API/cards/$card_id/comments" \
+      --data-raw "$unblock_comment" > /dev/null
+    ;;
+
+  comment)
+    card_id="${1:?Usage: board-cli comment <card_id> <text>}"
+    text="${2:?Usage: board-cli comment <card_id> <text>}"
+    comment_payload=$(node "$SCRIPT_DIR/../../lib/board-cli-helpers.js" makeCommentPayload "$text")
+    result=$(board_curl -X POST -H "$AUTH" -H "Content-Type: application/json" \
+      "$API/cards/$card_id/comments" \
+      --data-raw "$comment_payload")
+    comment_id=$(echo "$result" | node "$SCRIPT_DIR/../../lib/board-cli-helpers.js" extractCommentId 2>/dev/null || echo "")
+    if [[ -n "$comment_id" ]]; then
+      record_agent_action "$card_id" "comment:$comment_id"
+    else
+      record_agent_action "$card_id" "comment"
+    fi
+    echo "$result"
+    ;;
+
+  update)
+    card_id="${1:?Usage: board-cli update <card_id> <field> <value>}"
+    field="${2:?Usage: board-cli update <card_id> <field> <value>}"
+    value="${3:?Usage: board-cli update <card_id> <field> <value>}"
+    update_payload=$(node "$SCRIPT_DIR/../../lib/board-cli-helpers.js" makeUpdatePayload "$field" "$value")
+    record_agent_action "$card_id" "update"
+    board_curl -X PATCH -H "$AUTH" -H "Content-Type: application/json" \
+      "$API/cards/$card_id" \
+      --data-raw "$update_payload"
+    ;;
+
+  comments)
+    card_id="${1:?Usage: board-cli comments <card_id>}"
+    board_curl -H "$AUTH" "$API/cards/$card_id/comments"
+    ;;
+
+  wip-age)
+    board_data=$(board_curl -H "$AUTH" "$API/cards?board_ids=$BOARD_ID&per_page=100")
+    node "$SCRIPT_DIR/../../lib/board-cli-helpers.js" wipAge "$board_data" "$API" "$BOARD_API_KEY"
+    ;;
+
+  columns)
+    board_id="${1:-$BOARD_ID}"
+    board_curl -H "$AUTH" "$API/boards/$board_id/columns"
+    ;;
+
+  lanes)
+    board_id="${1:-$BOARD_ID}"
+    board_curl -H "$AUTH" "$API/boards/$board_id/lanes"
+    ;;
+
+  help|*)
+    head -35 "$SCRIPT_DIR/board-cli"
+    ;;
+esac
