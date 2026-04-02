@@ -1,5 +1,7 @@
 # Agentic Kanban Blueprint
 
+### Seriously: read this before doing anything else.
+
 A working reference for running AI agents with Kanban discipline.
 
 This repository documents how to coordinate autonomous AI agents using a Kanban board as the shared source of truth. It's extracted from a real production system where AI agents deliver software, manage their own work queues, and learn from session to session, all coordinated through explicit flow management.
