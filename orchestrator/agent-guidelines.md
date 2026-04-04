@@ -60,12 +60,13 @@ This is a minimum spec, not a template to fill robotically. A one-liner is fine 
 4. **Tag the PO in comments that need their attention.** Use this for: review guidance, blocker notifications, questions, and any comment where the PO needs to act. Do not tag on routine progress updates.
 5. If blocked mid-progress: block the card in place with a clear reason. Card stays in Doing — never moves columns until work is complete or cancelled. Tag the PO with enough context to act without asking follow-up questions.
 6. When unblocked: clear the block, then continue work
-7. When work is complete, choose one:
-   - **Shipped/Live is the default path.** Tests pass, build clean, no product decision required — move directly to Shipped/Live. Most cards should take this path. Technical work, bug fixes, security hardening, infrastructure changes, refactoring, and backend logic all ship directly.
-   - **Done (review) is the exception, not the default.** Only use Done when the card genuinely requires the PO's product judgement before it can ship — specifically: UI/UX changes users will see, user-facing copy, architectural decisions that constrain future work, or product experience changes. If in doubt, ask: "Would shipping this without the PO seeing it first risk something they'd want to change?" If no, ship it.
+7. When code is complete: push the branch, open a PR, confirm CI passes. **Immediately add a card comment with the PR URL** (format: `PR: https://github.com/org/repo/pull/N`). Then choose a tier:
+   - **Tier 1 — auto-ship (default for technical work).** If ALL of: CI green, diff under 200 lines, no UI/UX/copy/architecture changes, and the done-when is self-verifiable. Merge the PR to main. Confirm deployment succeeds. Move to **Shipped/Live**.
+   - **Tier 2 — lightweight PO approval.** Larger technical work or changes touching areas the PO cares about but not requiring deep product review. Tag the PO in a card comment with the PR link and a one-line summary. Wait for their merge signal. Merge when approved, confirm deployment, move to **Shipped/Live**.
+   - **Tier 3 — product review via Done/VR.** Only when the card genuinely requires the PO's product judgement: UI/UX users will see, user-facing copy, architectural decisions constraining future work. Move to **Done** with the PR URL and what specifically needs review. Tag the PO.
    - **Done is full**: block the card in Doing with reason "Done at capacity"
 8. If rework is flagged in Validation/Rework: resolve within that column — do not move the card back
-9. Move to Shipped/Live when deployed/confirmed
+9. **Shipped/Live means the PR is merged to main and deployment is confirmed live.** Consider adding a gate in your board CLI that refuses moves to Shipped/Live unless the linked PR is in MERGED state. This makes it mechanically impossible for the board to lie about deployment status.
 10. Move to Closed when done
 11. **Auto-archive**: cards in Closed are archived after 14 days. This keeps the board clean without manual housekeeping. If your board tool supports automation rules, configure this as a scheduled policy rather than relying on agents to remember.
 
@@ -182,10 +183,10 @@ The goal is agents that think about sequencing as part of pulling work, not a pr
 - Make commits to feature branches (not main)
 - Push feature branches to remote
 - Open pull requests
+- **Merge Tier 1 PRs to main** (CI green, diff under 200 lines, no UI/UX/copy/architecture changes, self-verifiable done-when). If your repos auto-deploy on merge, merging IS deploying; grant this authority deliberately. The alternative is every PR waiting for the PO, which creates a merge bottleneck that leads to orphaned branches and a board that lies about deployment status.
 
 ### Agents SHOULD CONFIRM before
-- Merging PRs to main
-- Deploying anything
+- Merging Tier 2+ PRs to main (larger diffs, or changes touching areas the PO cares about)
 - Deleting files, branches, or data
 - Making architectural decisions that affect other workstreams
 - Installing new dependencies
@@ -381,6 +382,31 @@ Key commands (run from the orchestrator workspace):
 - Move cards: `board-cli move <id> <column_id>`
 - Add comments: `board-cli comment <id> "text"`
 
+## Session startup routine (mandatory, every session)
+
+Every agent session in this repo must self-orient. Do not open with
+"ready when you are" or "what do you need?". The board tells you what to do.
+
+1. Read this file and agent-guidelines.md
+2. Check domain knowledge for relevant domains
+3. Check the board — understand what's in flight
+4. Check for stale branches: `git branch --no-merged main` — flag any
+   branch older than 3 days with no merged PR
+5. Determine focus: your cards in Doing, Ready cards tagged to active initiatives
+6. Declare intent and start: "I intend to [action] because [reason]. Starting now."
+7. If nothing is actionable, say why and suggest what could unblock flow.
+
+## Merge authority
+
+- **Tier 1 (merge autonomously)**: CI green, diff under 200 lines,
+  no UI/UX/copy/architecture, self-verifiable done-when.
+- **Tier 2 (request approval)**: Larger or sensitive changes.
+  Tag PO with PR link, wait for signal.
+- **Tier 3 (product review)**: UI/UX, copy, architecture.
+  Move card to Done.
+
+Every PR must be linked to its card via a comment with the PR URL.
+
 ## Communication
 
 Be direct, honest, specific. No flattery, no "Great question!", no softening.
@@ -416,6 +442,22 @@ Relevant domains for this project: [list them]
 ```
 
 The communication and secrets sections are **not pointers**; they're standalone. This is deliberate. If a sub-agent doesn't read the agent-guidelines.md (or loses it from context), these two sections are too important to be missing. The cost of duplication is a few lines of text. The cost of omission is leaked secrets or sycophantic output.
+
+## Agent Startup Routine (all agents, all projects)
+
+This applies to every AI agent session: orchestrator-dispatched sub-agents, standalone sessions opened directly in a project repo, and agents in multi-principal workspaces. **No agent should ever open with "ready when you are", "what do you need?", or "how can I help?"** The board and the CLAUDE.md contain everything needed to self-orient.
+
+On session start:
+
+1. **Read instructions**: project CLAUDE.md (which points to this file)
+2. **Read domain knowledge**: relevant domains from the knowledge system
+3. **Check the board**: understand what's in flight across all agents. Identify which initiatives are active and which cards in Ready are tagged to them.
+4. **Check for stale branches**: run `git branch --no-merged main` (or `master`) in the project repo. For each unmerged branch, check if a PR exists and if the corresponding card is still active. Flag any branch older than 3 days without a merged PR as likely orphaned work.
+5. **Determine focus**: what cards are relevant to this project? What's in Doing that you could resume? What's in Ready that you could pull? Is in-progress under WIP target?
+6. **Declare intent and execute**: state what you will work on and why, then start. Format: "I intend to [action] because [reason]. Starting now." Don't wait for assignment, approval, or a prompt. If you need to ask a clarifying question, ask it alongside your intent, not instead of it.
+7. **If nothing is actionable**: say so explicitly with why (WIP full, all relevant work blocked, no Ready cards for this project's initiatives). Suggest what could unblock flow.
+
+**Agents must not sit idle in an active session.** The board is the assignment mechanism. If there's capacity and relevant work, pull it.
 
 ## Key References
 

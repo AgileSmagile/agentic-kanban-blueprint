@@ -84,6 +84,21 @@ These are real failures from the production system this blueprint was extracted 
 
 **The lesson:** Local optimisation breaks system flow. Agents need to check downstream capacity, not just their own column.
 
+## Cards shipped but PRs never merged
+
+**What happened:** 15 feature branches across two repos had unmerged code, all with their cards marked as Shipped/Live on the board. The product owner believed the work was deployed. It wasn't. Changes expected to be live were still sitting on feature branches.
+
+**Why it happened:** The policy said "agents should confirm before deploying." In practice, agents created branches, opened PRs, and moved cards to Shipped/Live because from their perspective the work was done. But "PR opened" is not "deployed." Nobody merged the PRs. The board said one thing; the repos said another. The ambiguity between "committed," "pushed," "PR opened," "merged," and "deployed" was never resolved in the guidelines.
+
+**Fix forward:**
+- Defined exactly what Shipped/Live means: the PR is merged to main AND deployment is confirmed. Not PR opened, not CI green, not "work complete"
+- Added a gate in the board CLI that refuses moves to Shipped/Live unless the linked PR is in MERGED state. The board physically cannot lie about deployment status
+- Required every PR to be linked to its card via a comment with the PR URL. This gives the gate something to check and provides an audit trail
+- Introduced tiered merge authority: agents can merge small technical PRs autonomously (Tier 1), request lightweight approval for larger changes (Tier 2), and use the full Done/VR review path only for product decisions (Tier 3). This removed the PO as a bottleneck on work that didn't need their eyes
+- Added a startup routine where agents check for stale branches at session start, catching orphaned work early
+
+**The lesson:** If an agent can move a card to "done" without the code actually being deployed, the board and reality will eventually diverge. The gap between "I finished the code" and "users can see the change" must be mechanically enforced, not left to process discipline. And if the PO is the only person who can merge, every branch is blocked on a human who has other things to do.
+
 ## The common thread
 
 Every failure above shares a root cause: relying on agents to make the right judgment call in the moment, rather than building systems that make the wrong call difficult or impossible.

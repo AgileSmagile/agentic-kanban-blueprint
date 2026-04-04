@@ -98,11 +98,18 @@ If you make a decision in your head but don't update the board or the guidelines
 
 When you catch yourself thinking "they should know that," ask: where is it written? If it's nowhere, write it. The board, the CLAUDE.md, the knowledge system, a card comment: anywhere persistent is better than your head.
 
-### Accept that you are the constraint
+### Accept that you are the constraint — then reduce the constraint
 
 In an agentic system, the human is almost always the bottleneck. Not because you're slow, but because you're the only one who can do certain things (set direction, validate product, manage compliance, maintain relationships). The system is designed to maximise what agents can do without you, so that your limited time is spent on the things only you can do.
 
-If you find agents are frequently blocked waiting for you, that's a signal. Either you're reviewing things that could ship directly, or you haven't delegated enough context into the board and guidelines. Both are fixable.
+If you find agents are frequently blocked waiting for you, that's a signal. Common causes and fixes:
+
+- **You're reviewing things that could ship directly.** Most technical work (bug fixes, refactoring, infrastructure, backend logic) doesn't need your eyes. Only UI/UX, copy, and architectural decisions genuinely need product judgement. Make agents explicitly categorise their work before requesting review.
+- **You're the only one who can merge PRs.** If your repos auto-deploy on merge to main, the merge step IS the deploy step. Granting agents authority to merge small, well-tested, technical PRs autonomously (what we call "Tier 1" in the guidelines) removes you from the critical path for the majority of work. Tier 1 criteria: CI green, diff under 200 lines, no UI/UX/copy/architecture changes, self-verifiable done-when.
+- **You haven't delegated enough context into the board.** Cards with vague descriptions force agents to ask you questions. Cards with clear "done when" criteria let agents self-verify.
+- **Agents are waiting for you to tell them what to do.** If agents open sessions with "ready when you are" instead of pulling from the board and declaring intent, the startup routine needs strengthening. The board should be self-explanatory enough that no agent needs a human to interpret it.
+
+The goal is not to remove yourself from the system. It's to ensure you're only involved where your judgement genuinely adds value.
 
 ## How to brief agents: specificity scales with certainty
 

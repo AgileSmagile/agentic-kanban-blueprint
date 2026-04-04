@@ -18,8 +18,8 @@ Upfront honesty: this isn't free to run.
 
 | What you need | Cost | Notes |
 |---------------|------|-------|
-| AI agent (Claude Code) | $20/month | Required. Other AI tools with similar capabilities may work. |
-| Kanban board | $0-179/month | Required. Free options exist (Trello, GitHub Projects). Paid tools like Businessmap have better Kanban features. |
+| AI agent (Claude Code) | $20-75/month | Required. Other AI tools with similar capabilities may work. |
+| Kanban board | $0-10/month(per user) | Required. Free options exist (Trello, GitHub Projects). Your agent could even build one.  Businessmap is optimised for Kanban, and has reliable API. |
 | Everything else | $0 | Database, networking, automation, monitoring all have free tiers. |
 | Hardware (optional) | ~$115 one-time | Only if you self-host instead of using cloud services. |
 | **Minimum to start** | **$20/month** | AI subscription + free board tool. |

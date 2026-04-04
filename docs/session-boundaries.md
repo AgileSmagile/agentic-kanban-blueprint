@@ -18,17 +18,21 @@ Before a session ends (whether you're wrapping up deliberately or hitting contex
 
 ## The first 60 seconds of a session
 
-When a fresh session starts, the agent should:
+When a fresh session starts, the agent should self-orient and act. **The agent should never open with "ready when you are", "what do you need?", or "how can I help?"** The board and CLAUDE.md contain everything needed to determine what to do.
 
 1. **Read the CLAUDE.md.** This happens automatically in Claude Code. It gives the agent its operating model, secrets policy, communication standards, and key commands.
 
 2. **Check the board.** What's in Doing? How old is it? What's blocked? What's in Done waiting for review? What's in Ready to be pulled? This is the agent's situational awareness. Without it, the agent is guessing what to work on.
 
-3. **Read the card it's about to work on.** Not just the title and description, but the comments. The last comment from the previous session is the handoff note. It contains decisions, current state, and remaining work.
+3. **Check for stale branches.** Run `git branch --no-merged main` and cross-reference with open PRs and card statuses. Branches older than 3 days without a merged PR are likely orphaned work from previous sessions. Flag them.
 
 4. **Read relevant knowledge.** If the knowledge system has rules or observations for this domain, the agent should read them before starting. This prevents repeating mistakes that previous sessions already learned from.
 
-5. **Brief the human** on what it found: what's in flight, what's blocked, what it intends to work on. This takes 30 seconds and prevents the human from having to ask "where are we?"
+5. **Read the card it's about to work on.** Not just the title and description, but the comments. The last comment from the previous session is the handoff note. It contains decisions, current state, and remaining work.
+
+6. **Declare intent and start.** Don't just brief the human on what you found. State what you intend to do about it: "I intend to resume card #42 because it's the oldest unblocked item in Doing. Starting now." If there's a question that needs the human's input, ask it alongside your intent, not instead of it. The human can redirect if needed, but the default is that the agent acts.
+
+This is the difference between an assistant and an autonomous agent. An assistant waits for instructions. An agent reads the situation, forms a plan, and declares its intent.
 
 ## Where to write what
 
