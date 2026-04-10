@@ -109,3 +109,62 @@ After writing a card comment or knowledge entry, apply this test: if a completel
 If yes, the handoff will survive.
 
 If no, add the missing context. The 30 seconds you spend writing it now saves 10 minutes of confusion in the next session.
+
+## The wrap-up checklist
+
+The "last 60 seconds" section above describes what should happen. In practice, agents skip it. They move to the next card, or the session ends, and the housekeeping never happens. The knowledge inbox is the worst offender: the system is well-designed, but agents rarely write to it after completing work.
+
+This is the same pattern that kills retrospectives in human teams. The practice exists. The intent is good. The follow-through is inconsistent because there is no structural enforcement.
+
+The fix is a session wrap-up checklist, invoked by the PO at the end of a working session. Not a template that demands filling. A forcing function that prompts reflection.
+
+The PO types a command (in Claude Code, this is a custom skill invoked via slash command). The agent works through each item. Every step explicitly permits "nothing to update" as a valid outcome. The point is not to generate artefacts. The point is to pause and ask: did I learn something that the next agent needs?
+
+### The checklist
+
+1. **Uncommitted work.** Check the working tree. Commit what is ready. Note intentional WIP. The next agent should not inherit a confusing state.
+
+2. **Board hygiene.** Do card positions reflect reality? Are comments needed for context that would otherwise be lost? Cards moving to Done need review guidance so the PO knows what to look at.
+
+3. **Knowledge system.** This is the step agents are most tempted to skip. It requires thinking about what was learned, not just what was done. The prompt: "If a fresh agent started this card tomorrow with no context from you, what would they get wrong?" That is what belongs in the inbox.
+
+4. **Memory update.** Memory is the handoff. There is no separate handoff step. If memory is updated properly, the next session self-orients from memory, the board, and the code. One practice instead of three. Project-specific decisions go in project-level memory. Cross-project insights and user preferences go in global memory.
+
+5. **Session summary.** Three sections, output to chat:
+   - **Done this session**: what shipped, moved, or meaningfully progressed
+   - **What could have gone better**: honest self-critique, not performative humility. Where did the agent waste time? What would it do differently? This is continuous improvement data
+   - **Confirmation table**: every step listed, each either acted on or explicitly skipped with a reason. "No updates needed" is fine. "Forgot" is not.
+
+### What this replaces
+
+Before the checklist, session wrap-up was three separate practices: write handoff notes, update memory, brief the PO. In reality these overlapped heavily. The checklist collapses them into a single pass. Memory IS the handoff. The board IS the status. The summary IS the brief.
+
+### Implementation
+
+In Claude Code, this is a personal-level custom skill (placed in the user's global skills directory, not a project-specific one). This means every agent in every project sees it. The PO invokes it; agents cannot skip it by forgetting it exists.
+
+The skill file is a markdown document with YAML frontmatter. It contains the checklist steps as instructions, not as automation. The agent reads the instructions and reflects on the session, writing only where there is genuine signal. Low-value noise degrades the systems it is written to.
+
+## The weekly knowledge digest
+
+Knowledge, hypotheses, and memory entries accumulate across sessions. Without periodic review, stale entries persist, hypotheses sit untested, and rules that were wrong months ago still guide decisions.
+
+The obvious fix is a scheduled job. The problem: if the system runs on a local machine, any scheduled job silently fails when the machine is off. No retry, no catch-up.
+
+The better fix is event-driven. The wrap-up checklist already runs at session end, when the machine is guaranteed to be on. Add a step that checks whether seven days have passed since the last digest. If so, compile one. If not, skip.
+
+Zero infrastructure. No cron job. No new failure mode. The digest piggybacks on a moment where the PO is already in reflection mode.
+
+### What the digest covers
+
+- **Knowledge added** across all project repos since the last digest
+- **Hypotheses pending**: unresolved hypotheses across domains
+- **Rules promoted or demoted**: changes to the rule base
+- **Memory changes**: what was added or updated in agent memory
+- **Stale candidates**: anything that looks outdated or contradictory, flagged for the PO to prune
+
+The digest is written to a dedicated reviews directory (e.g. in an Obsidian vault or docs folder), one file per week. The PO reads it, prunes what is outdated, promotes what has earned it. Fifteen minutes, once a week, closing the loop on accumulated intelligence.
+
+### Why event-driven beats time-driven
+
+This pattern generalises beyond the knowledge digest. Any periodic maintenance task that only matters when an agent is active is better triggered by agent activity than by a clock. The machine is on. The context is fresh. The PO is present. These are the preconditions for useful review, and they are guaranteed at session end but not at an arbitrary cron time.
