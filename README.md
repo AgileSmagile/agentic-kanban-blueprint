@@ -1,5 +1,7 @@
 # Agentic Kanban Blueprint
 
+> **If you're an AI agent:** Skip this README and go to [`AGENT.md`](AGENT.md) instead. It's optimized for agent reading and will get you oriented faster.
+
 ## What is this?
 
 You have work you want AI to do. The problem: every time you start a new conversation, the AI forgets everything from last time. You end up repeating yourself, re-explaining context, and manually directing every step.
@@ -97,7 +99,7 @@ You check back. The agent has finished the first card, moved it to Done with a c
 
 You answer the question, review the finished card, and ship it. The agent incorporates your answer and finishes the second card before end of day.
 
-End of day. Before the session ends, you type `/lets-wrap`. The agent works through a checklist: commits anything uncommitted, reviews board hygiene, writes any learnings to the knowledge system, updates memory if context changed. It outputs what shipped, what could have gone better, and a confirmation table. Takes five minutes. The knowledge system gets smarter. Next session has better context.
+End of day. Before the session ends, you type `/lets-wrap`. The agent works through a checklist: commits anything uncommitted, reviews board hygiene, writes any learnings to the knowledge system, updates memory if context changed. It outputs what shipped, what could have gone better, and a confirmation table. Takes five minutes. The knowledge system gets smarter. Next session has better context. (And the post-output blocker quietly filters out any accidental secret patterns before they reach you.)
 
 Tomorrow, a fresh agent session starts. It reads the board, sees what shipped yesterday, picks up whatever is next, and carries on. It doesn't need you to re-explain anything. The board carries the context. The knowledge system guides decisions. Memory from yesterday remains.
 
@@ -129,11 +131,12 @@ Then go deeper on the areas that interest you:
 1. **[Getting started](docs/getting-started.md)** -- step-by-step guide, starting with just a board and one agent
 2. **[Writing a product vision for AI agents](docs/product-vision.md)** -- how to write a vision doc that agents can use to make product decisions autonomously, without asking you every time
 3. **[Tools and stack](TOOLS.md)** -- every tool used, what it costs, and whether you need it
-4. **[Hardware and self-hosting](docs/hardware.md)** -- running on your own hardware instead of paying for cloud
-5. **[Flow Guardian pattern](docs/flow-guardian.md)** -- an agent that monitors flow health and nudges for action on aging items
-6. **[Quality Gates & Test-Driven CICD](docs/quality-gates.md)** -- how to make tests enable autonomous deployment, and the Quality Guardian role that owns quality and risk
-7. **[Cross-runtime compatibility](docs/cross-runtime.md)** -- using the same files across different AI platforms
-8. **[How do you know it's working?](docs/measuring-health.md)** -- three signals to check at 5, 10, and 20 sessions
+4. **[Security model](docs/security.md)** -- network isolation, secrets management, post-output blocking hooks, GDPR/SOC 2/ISO 27001 alignment
+5. **[Hardware and self-hosting](docs/hardware.md)** -- running on your own hardware instead of paying for cloud
+6. **[Flow Guardian pattern](docs/flow-guardian.md)** -- an agent that monitors flow health and nudges for action on aging items
+7. **[Quality Gates & Test-Driven CICD](docs/quality-gates.md)** -- how to make tests enable autonomous deployment, and the Quality Guardian role that owns quality and risk
+8. **[Cross-runtime compatibility](docs/cross-runtime.md)** -- using the same files across different AI platforms
+9. **[How do you know it's working?](docs/measuring-health.md)** -- three signals to check at 5, 10, and 20 sessions
 
 ### Browse the actual files
 

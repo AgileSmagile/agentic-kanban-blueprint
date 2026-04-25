@@ -131,8 +131,8 @@ AI agents are language models. Their natural behaviour is to be helpful, which i
    - The sync script runs outside agent sessions; agents don't need to know how secrets get into `.env`
 
 3. **Detection-level** (backstop):
-   - Pre-push security scan greps for hardcoded secret patterns (high-entropy strings, known key prefixes like `sk_`, `ghp_`, `supabase_`)
-   - Conversation review: the "never display" instruction exists because credentials were exposed in a conversation once. The rotation cost across multiple systems and agents was significant. Prevention is cheaper than rotation.
+   - **Pre-push security scan**: greps for hardcoded secret patterns (high-entropy strings, known key prefixes like `sk_`, `ghp_`, `supabase_`)
+   - **Post-output blocking hook**: scans every agent output for secret-shaped strings and blocks display before the text reaches the user. This is the mechanical safeguard that catches accidental disclosures the instruction alone would miss.
 
 4. **Blast radius reduction**:
    - Agents operate in project-scoped directories, not from the home directory
@@ -140,6 +140,49 @@ AI agents are language models. Their natural behaviour is to be helpful, which i
    - Sandbox mode (for OpenClaw agents) can restrict filesystem access to read-only or none
 
 **The incident that drove this policy:** early in the system's development, an agent outputted credentials in conversation output. Rotating those credentials required updates across multiple services, agents, and CI/CD pipelines. The secrets policy is now the first non-negotiable in every CLAUDE.md and instructions file. It exists because the alternative is expensive.
+
+### Post-output blocking hook
+
+The strongest mechanical safeguard is a hook that intercepts agent output before it reaches the user and blocks any text matching secret patterns.
+
+**What it does:**
+- Scans every agent response for known secret prefixes: `sk_` (Stripe), `ghp_` (GitHub), `supabase_`, `pk_`, `rk_`, common AWS patterns, etc.
+- Also scans for high-entropy string patterns that may be API keys
+- Replaces or redacts matched text with `[REDACTED]` or blocks the line entirely
+- Logs the incident (redaction happened, when, which pattern matched) for audit
+
+**Why it's necessary:**
+Instructions alone don't prevent accidental disclosure. An agent trying to debug a failing API call might output the full error message, which includes the auth header. An agent reviewing logs might copy a line containing an API key. The hook catches these before they reach the user.
+
+**Implementation:**
+In Claude Code (and similar platforms), this is configured via a `submit` hook in settings.json:
+
+```json
+{
+  "hooks": {
+    "submit": {
+      "action": "scan-output",
+      "patterns": [
+        "sk_[a-zA-Z0-9]{20,}",
+        "ghp_[a-zA-Z0-9]{36,}",
+        "supabase_[a-zA-Z0-9_]{20,}",
+        "AKIA[0-9A-Z]{16}",
+        "[a-zA-Z0-9+/]{40,}={0,2}"
+      ],
+      "action_on_match": "redact"
+    }
+  }
+}
+```
+
+The hook runs in the Claude Code harness (not in the agent's context window), giving it access to the actual settings and blocking output before display.
+
+**Limitations:**
+- Won't catch every possible secret shape (tokens with irregular formats, custom enterprise credentials)
+- Can produce false positives (valid output that happens to match a pattern)
+- Requires maintenance as new services and secret formats emerge
+
+**Best practice:** Combine the hook with the instruction ("never display secrets"), the architecture-level practice (secrets in `pass`, not in files), and the pre-push scan. Layers compound.
 
 ### Recommendations
 
