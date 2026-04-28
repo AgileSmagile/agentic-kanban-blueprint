@@ -20,11 +20,11 @@ Upfront honesty: this isn't free to run.
 
 | What you need | Cost | Notes |
 |---------------|------|-------|
-| AI agent (Claude Code) | ~£16-75/month | Required. Pro (~£16/month) for lighter use; Max (~£75/month) for heavy agentic workloads. Other AI tools with similar capabilities may work. |
+| AI agent (Claude Code) | ~75/month | Min spec = Anthropic's Max subscription (~£75/month), but use the appropriate model for the job else you'll consistently hit rate limits on heavy agentic workloads. Pro (~£16/month) is impractical for this system.  Other AI tools with similar capabilities may work. |
 | Kanban board | £0 to ~£38/month | Required. Free: Trello, GitHub Projects (or build your own). Paid: [Businessmap](https://businessmap.io/signup-partners?referral_code=smagile90referral) (from ~£38/month for 5 users, 90-day trial) has the best Kanban semantics and API. |
 | Everything else | £0 | Database, networking, automation, monitoring all have free tiers. |
 | Hardware (optional) | ~£160 one-time | Only if you self-host instead of using cloud services. |
-| **Minimum to start** | **~£16/month** | AI subscription + free board tool. |
+| **Minimum to start** | **~£75/month** | AI subscription + free board tool. |
 
 See [TOOLS.md](TOOLS.md) for the full breakdown.
 
@@ -196,4 +196,4 @@ The current architecture is a product of those starting points combined with sus
 
 ---
 
-Built with [Claude Code](https://claude.ai/code). Coordinated with [Businessmap](https://businessmap.io). Grounded in [ProKanban](https://prokanban.org) principles.
+Built with [Claude Code](https://claude.ai/code). Coordinated with [Businessmap](https://businessmap.io). Grounded in [ProKanban](https://prokanban.org)'s Kanban strategy.
