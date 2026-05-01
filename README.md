@@ -20,10 +20,10 @@ Upfront honesty: this isn't free to run.
 
 | What you need | Cost | Notes |
 |---------------|------|-------|
-| AI agent (Claude Code) | ~75/month | Min spec = Anthropic's Max subscription (~£75/month), but use the appropriate model for the job else you'll consistently hit rate limits on heavy agentic workloads. Pro (~£16/month) is impractical for this system.  Other AI tools with similar capabilities may work. |
+| AI agent (Claude Code) | ~75/month | Min spec = Anthropic's Max subscription (~£75/month), but use the appropriate model for the job else you'll consistently hit rate limits on heavy agentic workloads. (Note that their Pro (~£16/month) is impractical for this system.)  Other AI tools with similar capabilities may work. |
 | Kanban board | £0 to ~£38/month | Required. Free: Trello, GitHub Projects (or build your own). Paid: [Businessmap](https://businessmap.io/signup-partners?referral_code=smagile90referral) (from ~£38/month for 5 users, 90-day trial) has the best Kanban semantics and API. |
 | Everything else | £0 | Database, networking, automation, monitoring all have free tiers. |
-| Hardware (optional) | ~£160 one-time | Only if you self-host instead of using cloud services. |
+| Hardware (optional) | ~£160 one-time | Only if you self-host instead of using cloud services.  Consider Netlify for cloudhosting as an alternative (see tools). |
 | **Minimum to start** | **~£75/month** | AI subscription + free board tool. |
 
 See [TOOLS.md](TOOLS.md) for the full breakdown.
@@ -109,11 +109,12 @@ You check back. The agent has finished the first card, moved it to Done with a c
 
 You answer the question, review the finished card, and ship it. The agent incorporates your answer and finishes the second card before end of day.
 
-End of day. Before the session ends, you type `/lets-wrap`. The agent works through a checklist: commits anything uncommitted, reviews board hygiene, writes any learnings to the knowledge system, updates memory if context changed. It outputs what shipped, what could have gone better, and a confirmation table. Takes five minutes. The knowledge system gets smarter. Next session has better context. (And the post-output blocker quietly filters out any accidental secret patterns before they reach you.)
+End of day. Before the session ends, you type `/lets-wrap`. The agent works through a checklist: commits anything uncommitted, reviews board hygiene, writes any learnings to the knowledge system, updates memory if context changed. It outputs what shipped, what could have gone better, and a confirmation table. Takes five minutes + follow on you may chose to do, given some gold can get surfaced, here. 
+The knowledge system gets smarter. Next session has better context. (And the post-output blocker quietly filters out any accidental secret patterns before they reach you.)
 
 Tomorrow, a fresh agent session starts. It reads the board, sees what shipped yesterday, picks up whatever is next, and carries on. It doesn't need you to re-explain anything. The board carries the context. The knowledge system guides decisions. Memory from yesterday remains.
 
-That's the system. Some days you're more hands-on; some days you barely check in. But every session ends the same way: reflection, knowledge capture, handoff. The board and knowledge system make continuity work.
+That's the system. Some days you're more hands-on than others, but every session ends the same way: reflection, knowledge capture, handoff. The board and knowledge system make continuity work.
 
 ## How to use this repository
 
