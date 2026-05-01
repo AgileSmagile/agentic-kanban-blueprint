@@ -95,7 +95,7 @@ The same logic applies to learning. Each completed task leaves behind a structur
 
 ### 7. Security is architectural, not instructional
 
-Telling an AI agent "don't leak secrets" in its instructions is the weakest form of protection. The real security comes from network isolation (running agents on a separate network segment), encrypted secrets management, scope boundaries (agents can only access their own project), and automated security scans before code is shared. See [docs/security.md](docs/security.md) for the full model.
+Telling an AI agent "don't leak secrets" in its instructions is the weakest form of protection. The real security comes from network isolation (running agents on a separate network segment), encrypted secrets management, scope boundaries (agents can only access their own project), and mechanical enforcement via hooks that block secret exposure before it reaches the terminal. The security doc includes a working `block-secrets.sh` script and `settings.json` config you can lift and adapt. See [docs/security.md](docs/security.md) for the full model.
 
 ## What a typical day looks like
 
@@ -141,7 +141,7 @@ Then go deeper on the areas that interest you:
 1. **[Getting started](docs/getting-started.md)** -- step-by-step guide, starting with just a board and one agent
 2. **[Writing a product vision for AI agents](docs/product-vision.md)** -- how to write a vision doc that agents can use to make product decisions autonomously, without asking you every time
 3. **[Tools and stack](TOOLS.md)** -- every tool used, what it costs, and whether you need it
-4. **[Security model](docs/security.md)** -- network isolation, secrets management, post-output blocking hooks, GDPR/SOC 2/ISO 27001 alignment
+4. **[Security model](docs/security.md)** -- network isolation, secrets management, **liftable hook code** for blocking secret exposure, compaction resilience (PreCompact/PostCompact), and **silent flow nudges** that keep agents flowing without human intervention. GDPR/SOC 2/ISO 27001 alignment
 5. **[Hardware and self-hosting](docs/hardware.md)** -- running on your own hardware instead of paying for cloud
 6. **[Flow Guardian pattern](docs/flow-guardian.md)** -- an agent that monitors flow health and nudges for action on aging items
 7. **[Quality Gates & Test-Driven CICD](docs/quality-gates.md)** -- how to make tests enable autonomous deployment, and the Quality Guardian role that owns quality and risk
@@ -199,6 +199,8 @@ The knowledge system (knowledge/hypotheses/rules with promotion thresholds) was 
 Specific patterns in the operating model (time-decay on knowledge, failure-first observation capture, explicit decision vocabulary) were extracted from [AutoResearchClaw](https://github.com/aiming-lab/AutoResearchClaw) by selectively adapting what was useful.
 
 The threshold-based specialist dispatch pattern and task-level learning (idea 6 above) were informed by the ECAP/TECAP experience capsule framework in [ClawCode](https://github.com/deepelementlab/clawcode) by DeepElementLab, reinterpreted for async board-driven collaboration and adapted to the specific constraints of this system.
+
+The compaction resilience pattern (PreCompact/PostCompact hooks for keeping safety rules in context) was inspired by the precompact hook design in [MemPalace](https://github.com/MemPalace/mempalace), which persists memory to storage before context compression, reinterpreted here as a mechanism for re-injecting critical instructions rather than persisting data.
 
 The current architecture is a product of those starting points combined with sustained personal experimentation, real delivery sessions, and the application of ProKanban principles to agentic workflows.
 

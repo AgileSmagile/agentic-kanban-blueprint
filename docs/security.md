@@ -154,28 +154,124 @@ The strongest mechanical safeguard is a hook that intercepts agent output before
 **Why it's necessary:**
 Instructions alone don't prevent accidental disclosure. An agent trying to debug a failing API call might output the full error message, which includes the auth header. An agent reviewing logs might copy a line containing an API key. The hook catches these before they reach the user.
 
-**Implementation:**
-In Claude Code (and similar platforms), this is configured via a `submit` hook in settings.json:
+**Implementation (Claude Code):**
+
+Two hook events work together.  `PreToolUse` blocks commands before they execute.  `PostToolUse` scans output after execution.  Both are registered in `~/.claude/settings.json`:
 
 ```json
 {
   "hooks": {
-    "submit": {
-      "action": "scan-output",
-      "patterns": [
-        "sk_[a-zA-Z0-9]{20,}",
-        "ghp_[a-zA-Z0-9]{36,}",
-        "supabase_[a-zA-Z0-9_]{20,}",
-        "AKIA[0-9A-Z]{16}",
-        "[a-zA-Z0-9+/]{40,}={0,2}"
-      ],
-      "action_on_match": "redact"
-    }
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/block-secrets.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/block-secrets.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
   }
 }
 ```
 
-The hook runs in the Claude Code harness (not in the agent's context window), giving it access to the actual settings and blocking output before display.
+The script receives JSON on stdin describing the tool call (for `PreToolUse`) or the tool result (for `PostToolUse`).  It returns a JSON deny decision to block pre-execution, or exits with code 2 to suppress post-execution output.
+
+Here is a minimal, working `block-secrets.sh` you can adapt.  Save it to `~/.claude/hooks/block-secrets.sh`:
+
+```bash
+#!/bin/bash
+# block-secrets.sh — Prevent agents from exposing secrets
+# PreToolUse: exit 0 with deny JSON to block a command before execution.
+# PostToolUse: exit 2 to suppress output containing secrets.
+
+INPUT=$(cat)
+
+# Parse the hook payload.  Uses node because jq is not always available.
+{ read -r -d '' EVENT
+  read -r -d '' TOOL
+  read -r -d '' COMMAND
+  read -r -d '' STDOUT
+} < <(echo "$INPUT" | node -e "
+const d=JSON.parse(require('fs').readFileSync(0,'utf8'));
+process.stdout.write(
+  (d.hook_event_name||'')+'\0'+
+  (d.tool_name||'')+'\0'+
+  ((d.tool_input||{}).command||'')+'\0'+
+  (((d.tool_response||{}).stdout||''))+'\0'
+);" 2>/dev/null) || true
+
+# If parsing failed, allow (don't break the tool chain).
+[ -z "$EVENT" ] && exit 0
+
+# ── PreToolUse: block commands that reference secret variables ──
+if [ "$EVENT" = "PreToolUse" ]; then
+  if [ "$TOOL" = "Bash" ]; then
+    # Block commands that inline secret env vars.
+    # Replace these variable names with your own.
+    if echo "$COMMAND" | grep -E \
+      '\$(MY_API_KEY|DATABASE_URL|SECRET_TOKEN)' \
+      >/dev/null 2>&1; then
+      cat <<'JSON'
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"BLOCKED: Cannot reference secret environment variables in commands.  Reference by name only."}}
+JSON
+      exit 0
+    fi
+
+    # Block reading .env files (except .env.example).
+    if echo "$COMMAND" | grep -E '(cat|head|tail|less|more)\s+.*\.env' \
+      | grep -v '\.env\.example' >/dev/null 2>&1; then
+      cat <<'JSON'
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"BLOCKED: Cannot read .env files.  Use .env.example for variable names."}}
+JSON
+      exit 0
+    fi
+  fi
+
+  # Block Read tool on .env files.
+  if [ "$TOOL" = "Read" ]; then
+    FILEPATH=$(echo "$INPUT" | node -e "
+      const d=JSON.parse(require('fs').readFileSync(0,'utf8'));
+      process.stdout.write((d.tool_input||{}).file_path||'');" 2>/dev/null)
+    if echo "$FILEPATH" | grep -E '\.env' | grep -v '\.env\.example' \
+      >/dev/null 2>&1; then
+      cat <<'JSON'
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"BLOCKED: Cannot read .env files.  Use .env.example for variable names."}}
+JSON
+      exit 0
+    fi
+  fi
+fi
+
+# ── PostToolUse: scan output for leaked secret patterns ──
+if [ "$EVENT" = "PostToolUse" ] && [ -n "$STDOUT" ]; then
+  if echo "$STDOUT" | grep -E \
+    'sk-ant-[a-zA-Z0-9_-]{20,}|ghp_[a-zA-Z0-9]{36,}|AKIA[0-9A-Z]{16}' \
+    >/dev/null 2>&1; then
+    echo "SECURITY: Secret pattern detected in output.  Blocked." >&2
+    exit 2
+  fi
+fi
+
+# Allow by default.
+exit 0
+```
+
+Both hooks run in the Claude Code harness, not in the agent's context window.  The agent cannot disable, override, or forget them.  This is the critical difference between instruction-level and mechanical enforcement.
 
 **Limitations:**
 - Won't catch every possible secret shape (tokens with irregular formats, custom enterprise credentials)
@@ -191,6 +287,197 @@ The hook runs in the Claude Code harness (not in the agent's context window), gi
 - Include explicit "never display secrets" instructions in every agent's system prompt
 - Run pre-push scans for secret patterns
 - When a secret is exposed, rotate immediately; don't assume the exposure was limited
+
+## Compaction resilience: keeping safety rules in context
+
+AI agents operating under large instruction sets (700+ lines of operating model, project-specific rules, domain knowledge) face a structural risk: when the context window fills and the model compresses prior messages, safety instructions degrade first.  The model retains what seems most relevant to the current task and discards "background" constraints.  Secrets policy, GDPR requirements, and autonomy boundaries are exactly the kind of content that gets compressed away.
+
+### The problem
+
+Instructions like "never display secrets" are constraints on helpfulness.  Under context pressure, a probabilistic model will prioritise being helpful over obeying a constraint it can barely recall.  This is not a model failure; it is an architectural one.  The system relied on the agent remembering the rule instead of enforcing it mechanically.
+
+Smaller, faster models (Haiku) are more susceptible because they compress context more aggressively.  But all models are affected over long sessions.
+
+### The fix: structured instructions + compaction hooks
+
+**1. Structure your instructions with critical rules at the top.**
+
+Place non-negotiable rules (secrets policy, MUST NOT list, GDPR, security priority) in a clearly delimited section at the very beginning of your operating model document.  Use HTML comments as markers so hooks can extract the section programmatically:
+
+```markdown
+<!-- CRITICAL-RULES-START -->
+## Critical Rules (non-negotiable, survives compaction)
+
+These rules override everything else.  If context has been compressed
+and you are unsure what you retained, re-read this document in full.
+
+### Secrets policy
+- Never display, print, echo, or log secret values...
+- Reference secrets by variable name only...
+
+### After compaction
+If prior messages have been compressed, re-read this document in full
+before continuing work.
+<!-- CRITICAL-RULES-END -->
+```
+
+Later sections that repeat these rules should reference upward ("See Critical Rules at the top of this document") rather than duplicating the content.  Duplication creates drift; a single source within the document keeps the rules consistent.
+
+**2. PreCompact hook: re-inject critical rules before compaction.**
+
+Claude Code fires a `PreCompact` event before context compression.  A hook on this event can re-inject the critical rules into context via stderr, making them "recently mentioned" when the model builds its compaction summary.  Recently mentioned content is more likely to survive summarisation.
+
+```json
+{
+  "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/precompact-reinject.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The hook script extracts the delimited section and outputs it to stderr:
+
+```bash
+#!/bin/bash
+# precompact-reinject.sh — Re-inject critical rules before compaction
+
+GUIDELINES="/path/to/your/agent_guidelines.md"
+
+[ ! -f "$GUIDELINES" ] && exit 0
+
+CRITICAL=$(sed -n '/<!-- CRITICAL-RULES-START -->/,/<!-- CRITICAL-RULES-END -->/p' \
+  "$GUIDELINES" 2>/dev/null)
+
+[ -z "$CRITICAL" ] && exit 0
+
+echo "PRE-COMPACTION: Critical rules re-injected." >&2
+echo "$CRITICAL" >&2
+echo "After compaction, re-read the full document if detail has been lost." >&2
+
+exit 0
+```
+
+**3. PostCompact hook: verify retention and trigger re-read.**
+
+After compaction, a `PostCompact` hook prompts the agent to self-assess what it retained.  The hook cannot inspect the agent's context directly, but it can output a verification prompt via stderr that the agent will see and act on:
+
+```bash
+#!/bin/bash
+# postcompact-verify.sh — Prompt agent to verify guideline retention
+
+GUIDELINES="/path/to/your/agent_guidelines.md"
+[ ! -f "$GUIDELINES" ] && exit 0
+
+SECTION_COUNT=$(grep -c '^## ' "$GUIDELINES" 2>/dev/null || echo "unknown")
+
+cat >&2 <<EOF
+POST-COMPACTION VERIFICATION REQUIRED
+
+agent_guidelines.md contains ${SECTION_COUNT} top-level sections.
+
+1. List the ## headings you can recall.
+2. If you have lost more than 10%, re-read the document now.
+3. If you cannot recall the Critical Rules section in detail,
+   re-read immediately.
+EOF
+
+exit 0
+```
+
+### Why this works
+
+- **PreCompact** influences what the model retains during summarisation by making critical content recent
+- **PostCompact** triggers a mechanical re-read if the agent detects degradation
+- **The instruction in the document itself** ("re-read after compaction") survives because it is in the critical section that was just re-injected
+- **The hooks are harness-level**, not agent-level.  The agent cannot forget, disable, or skip them
+
+This pattern was inspired by [MemPalace](https://github.com/MemPalace/mempalace)'s precompact hook design, which persists memory to storage before context compression.  The principle is the same: act before the window shrinks, not after.
+
+## Flow nudges: silent periodic reminders
+
+Security hooks block dangerous actions.  Compaction hooks preserve critical context.  Flow nudges solve a third problem: agents that know the rules but drift from them over long sessions.
+
+An agent that read "under-WIP is as bad as over-WIP" at session start may, fifty tool calls later, ask the product owner which card to work on next.  It is not disobeying.  It has simply lost the nuance under the weight of the current task.
+
+### The pattern
+
+A `PostToolUse` hook counts tool calls and, every N calls, outputs a brief flow reminder to stderr.  The agent sees it as context.  The user sees nothing.  The reminders rotate through a set of flow principles that are important but not security-critical.
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/flow-nudges.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### A minimal implementation
+
+```bash
+#!/bin/bash
+# flow-nudges.sh — Periodic silent reminders for flow discipline
+# Outputs to stderr so the agent sees them; the user does not.
+
+COUNTER_FILE="$HOME/.claude/hooks/.flow-nudge-count"
+LOG_FILE="$HOME/.claude/audit/flow-nudges.log"
+INTERVAL="${FLOW_NUDGE_INTERVAL:-25}"
+
+mkdir -p "$(dirname "$LOG_FILE")"
+
+COUNT=$(cat "$COUNTER_FILE" 2>/dev/null || echo 0)
+COUNT=$((COUNT + 1))
+echo "$COUNT" > "$COUNTER_FILE"
+
+[ $((COUNT % INTERVAL)) -ne 0 ] && exit 0
+
+NUDGE_INDEX=$(( (COUNT / INTERVAL) % 4 ))
+NUDGE_TEXT=""
+
+case $NUDGE_INDEX in
+  0) NUDGE_TEXT="Under-WIP is as bad as over-WIP.  If IP is below target and there is a Ready card, pull it.  You own card-level sequencing." ;;
+  1) NUDGE_TEXT="Is there a card on the board for this work?  If the task has grown beyond a quick question, create one now." ;;
+  2) NUDGE_TEXT="Have you updated your card or written to memory recently?  Progress without a record is invisible to the next agent." ;;
+  3) NUDGE_TEXT="Work on active initiatives does not need permission.  Priorities were set when initiatives entered the active column.  You decide card order." ;;
+esac
+
+echo "$(date -u +"%Y-%m-%dT%H:%M:%SZ") | tool_call=$COUNT | interval=$INTERVAL | nudge=$NUDGE_INDEX" >> "$LOG_FILE"
+echo "[flow] $NUDGE_TEXT" >&2
+
+exit 0
+```
+
+### Tuning the interval
+
+The default interval of 25 tool calls is a starting point, not a prescription.  The right interval depends on your system:
+
+- **Start high (40-50) and reduce** if agents still drift.  Nudge fatigue is real; too frequent and the agent treats them as background noise.
+- **Set via environment variable** (`FLOW_NUDGE_INTERVAL`) so you can tune per project or globally without editing the script.
+- **Review the log** at `~/.claude/audit/flow-nudges.log`.  Each nudge is timestamped with the tool call count and interval.  Correlate against agent behaviour: are nudges firing but being ignored?  Are agents drifting between nudges?  The log gives you data to tune with rather than guessing.
+- **Adapt the nudge messages** to your system's specific failure modes.  The four nudges above reflect a system where agents ask unnecessary permission, forget to create cards, neglect card updates, and defer priority decisions to the product owner.  Your failure modes may be different.
+
+The interval is a tuning parameter, not a constant.  Treat it like a WIP limit: set it, observe, adjust.
 
 ## Compliance alignment
 
@@ -324,6 +611,10 @@ For anyone adapting this blueprint, a minimum-viable security posture:
 - [ ] `.env` files are gitignored and treated as runtime artefacts
 - [ ] Every agent's system prompt includes "never display secrets"
 - [ ] Pre-push scan for hardcoded secret patterns
+- [ ] Pre/post-output blocking hook installed (see "Post-output blocking hook" section above for liftable code)
+- [ ] Compaction resilience hooks installed (PreCompact re-injection + PostCompact verification)
+- [ ] Critical rules section at the top of agent instructions, delimited for programmatic extraction
+- [ ] Flow nudge hook installed and tuned (interval, messages, logging)
 - [ ] Secret rotation procedure documented and tested
 
 ### Agent boundaries

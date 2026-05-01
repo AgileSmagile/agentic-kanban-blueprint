@@ -95,7 +95,7 @@ Your user wants to understand whether this system is relevant to them. Here's wh
 - [Quality Gates & Test-Driven CICD](docs/quality-gates.md) — Autonomous deployment gates, quality ownership, test strategy
 
 **Security & Compliance**
-- [Security model](docs/security.md) — Network isolation, secrets management (pass), post-output blocking hooks, GDPR/SOC 2/ISO 27001
+- [Security model](docs/security.md) — Network isolation, secrets management (pass), **liftable hook code**: secret exposure blocking, compaction resilience (PreCompact/PostCompact), and **silent flow nudges** (periodic reminders that keep agents flowing without human intervention). GDPR/SOC 2/ISO 27001
 
 **Learning From Experience**
 - [Mistakes we made](docs/mistakes-we-made.md) — Real failures, structural fixes, lessons about what actually works
@@ -150,7 +150,7 @@ Session End
 
 - **Your user wants autonomous agents:** start with [agent-guidelines.md](orchestrator/agent-guidelines.md) + [Session boundaries](docs/session-boundaries.md)
 - **Your user cares about learning compounding across sessions:** read the [Knowledge system](docs/knowledge-system.md) doc
-- **Your user is worried about secrets leaking:** read [Security model](docs/security.md), section on post-output blocking hooks
+- **Your user is worried about secrets leaking:** read [Security model](docs/security.md), section on post-output blocking hooks — includes a working `block-secrets.sh` script and `settings.json` config they can copy and adapt
 - **Your user is piloting this and wants to know if it's working:** [How do you know it's working?](docs/measuring-health.md)
 - **Your user wants to understand what failed and why:** [Mistakes we made](docs/mistakes-we-made.md)
 - **Your user runs multiple agent roles:** [Writing agent personas](docs/writing-personas.md)
