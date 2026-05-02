@@ -1,5 +1,82 @@
 # Release Notes
 
+## v1.3.0 — Responsible autonomy, escalation patterns, and identity clarity
+
+**Release date:** 2026-05-02
+
+### What changed
+
+**1. Graduated autonomy model** *(new)*
+- Added `docs/graduated-autonomy.md`: five permission levels (0-4) from approval-on-everything to full YOLO, with concrete `settings.json` examples at each level
+- Core principle: hooks are the safety mechanism, permissions control how often you get interrupted
+- Each level lists which hooks must be installed and tested before you move up
+- Covers both Claude Code (granular settings.json) and OpenClaw (YOLO mode), acknowledging that OpenClaw users shift all enforcement to hooks
+- Framed as graduated progression, not a recommendation to bypass safety
+
+**2. Escalation patterns** *(new)*
+- Added `docs/escalation-patterns.md`: six patterns covering stuck-on-tool, missing information, irreversible actions, scope creep, conflicting instructions, and WIP capacity
+- Each pattern has a trigger, escalation path, and "what NOT to do"
+- Summary table mapping situations to who gets tagged and where
+- Extends the existing specialist dispatch and age-based intervention models
+
+**3. Identity clarity: reference architecture, not a product**
+- README and AGENT.md now explicitly frame AKB as a reference architecture, not a turnkey product
+- "Take as much or as little as is helpful for your agentic Kanban system"
+- Addresses the gap between "read all this and figure it out" and "clone this and start working"
+
+**4. Audience reframed**
+- "Who is this for?" rewritten to target independent business owners and product builders experimenting with agentic AI
+- Guardrails and hallucination risk called out explicitly alongside flow principles
+
+**5. Security and context hardening** *(since v1.2.0)*
+- Expanded security.md with compaction resilience (PreCompact/PostCompact hooks), flow nudge implementation, retry-loop detection, and circuit-breaker patterns
+- Added working `block-secrets.sh` script (liftable, adaptable)
+- Pre-compaction reinject and post-compaction verify hooks documented with implementation examples
+
+**6. Knowledge system: inbox removed, card comments as capture**
+- Removed `knowledge/inbox/` pattern (was creating orphaned entries nobody processed)
+- Knowledge observations now captured via card comments with user tags for key agents
+- Card comment thread becomes the audit trail; knowledge files are the distillation
+
+**7. Cross-runtime and portability improvements**
+- OpenClaw documentation expanded: configuration differences, hook compatibility, permission model comparison
+- Portability guidance improved across board tools, AI runtimes, and operating systems
+- Cost guidance updated with subscription realism (Claude Pro vs Max, Businessmap pricing)
+
+**8. Readability and structural improvements**
+- README readability pass: clearer flow, better section ordering
+- Agent guidelines expanded: specialist dispatch thresholds, handover conventions, dependency sequencing
+- Quality Guardian instructions expanded with niche testing scenarios
+
+### Why this matters
+
+- **Permissions are no longer a blind spot.**  Teams now have a clear path from "approve everything" to autonomous operation, with explicit safety prerequisites at each step.
+- **Agents know when to stop.**  Six escalation patterns mean agents have structured responses to ambiguity, not just "push through or give up."
+- **Honest framing.**  Calling AKB a reference architecture rather than a blueprint sets correct expectations.  People lift what they need rather than trying to adopt everything.
+- **Security is mechanical, not instructional.**  The expanded hooks, compaction resilience, and circuit-breaker patterns make safety a system property, not an agent instruction.
+
+### Action for teams using this blueprint
+
+- **Review graduated autonomy.**  If you're running at Level 0 (default) and finding approval fatigue, read `docs/graduated-autonomy.md` and install the prerequisite hooks before widening permissions.
+- **Check escalation patterns.**  If your agents push through problems silently or stop dead, `docs/escalation-patterns.md` gives them structured alternatives.
+- **Update your knowledge workflow.**  If you're still using `knowledge/inbox/`, switch to card-comment-based capture per the updated knowledge system docs.
+- **Install hooks.**  `block-secrets.sh`, retry-loop detection, and flow nudges are now documented with liftable implementations in `docs/security.md`.
+
+### No breaking changes
+
+All existing implementations continue to work.  The inbox removal is a pattern change, not a file deletion in your system; adapt at your own pace.
+
+### Commits
+
+- `de83445` — Subscription cost realism
+- `54d654f` — Switch from inboxing to card comments with user tags
+- `78f7394` — Security and context hardening
+- `d6cef84` — README readability improvements
+- `fc0ce40` — Independent review feedback: portability, cost guidance, inbox removal, OpenClaw docs
+- `[pending]` — Reference architecture framing, graduated autonomy, escalation patterns, audience reframe
+
+---
+
 ## v1.2.0 — Agent-optimized navigation & session boundary forcing
 
 **Release date:** 2026-04-25

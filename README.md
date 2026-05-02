@@ -12,7 +12,9 @@ You write down what needs doing on a card. The AI picks it up, does the work, up
 
 It gets more powerful with multiple AI assistants. One can build your website while another handles your outreach while a third manages your infrastructure, all pulling from the same board, all aware of each other's work, none duplicating effort.
 
-**This repository documents how to set it up.** It's extracted from a production system where AI agents deliver software, manage their own work queues, and learn from session to session. Everything here has been tested in real delivery across dozens of sessions.
+**This repository documents how to set it up.**  It's extracted from a production system where AI agents deliver software, manage their own work queues, and learn from session to session.  Everything here has been tested in real delivery across dozens of sessions.
+
+> **A note on what this is (and isn't):**  This is a reference architecture, not a turnkey product.  There is no installer, no `npm create`, no magic button.  It is a collection of patterns, policies, and working examples designed to be selectively lifted and adapted to suit your context.  Take as much or as little as is helpful for your agentic Kanban system.  The value is in the thinking, not in copying every file.
 
 ## What does it cost?
 
@@ -30,12 +32,14 @@ See [TOOLS.md](TOOLS.md) for the full breakdown.
 
 ## Who is this for?
 
-- You have work (software, content, research, operations) that you'd like AI to handle autonomously
-- You want to see what the AI is doing and redirect it when needed, without micromanaging every step
-- You want AI assistants that get smarter over time instead of starting from zero every session
-- You're curious how Kanban flow principles (WIP limits, age-based prioritisation, explicit policies) translate to AI coordination
+You're an independent business owner or product builder experimenting with agentic AI.  You've got Claude Code or OpenClaw running.  You've seen what it can do in a single session.  Now you want it to work across sessions, across projects, without you directing every step.
 
-You don't need to be a developer to understand the ideas. You do need some technical comfort to implement the full system, but the concepts are accessible to anyone.
+- You want agents that pick up where they left off instead of starting from zero every conversation
+- You want to see what they're doing and redirect when needed, without micromanaging
+- You want guardrails that prevent agents from hallucinating their way into production or burning tokens in circles
+- You're curious how flow principles (WIP limits, age-based prioritisation, explicit policies) translate to AI coordination
+
+You don't need to be a developer to understand the ideas.  You do need some technical comfort to implement the full system, but the concepts are accessible to anyone building with AI tools today.
 
 ## More than a to-do list
 
@@ -148,6 +152,8 @@ Then go deeper on the areas that interest you:
 7. **[Quality Gates & Test-Driven CICD](docs/quality-gates.md)** -- how to make tests enable autonomous deployment, and the Quality Guardian role that owns quality and risk
 8. **[Cross-runtime compatibility](docs/cross-runtime.md)** -- using the same files across different AI platforms
 9. **[How do you know it's working?](docs/measuring-health.md)** -- three signals to check at 5, 10, and 20 sessions
+10. **[Graduated autonomy](docs/graduated-autonomy.md)** -- how to progressively widen agent permissions as you add mechanical safety (settings.json levels, hook prerequisites, Claude Code vs OpenClaw)
+11. **[Escalation patterns](docs/escalation-patterns.md)** -- when agents should ask for help, who to tag, and how to keep work flowing while waiting
 
 ### Browse the actual files
 

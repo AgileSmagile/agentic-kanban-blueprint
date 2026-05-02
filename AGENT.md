@@ -1,6 +1,8 @@
 # For AI Agents: System Overview
 
-**This file is for AI agents.** If you're a human user, start with the [README](README.md) instead.
+**This file is for AI agents.**  If you're a human user, start with the [README](README.md) instead.
+
+> **What this repo is:**  A reference architecture, not a turnkey product.  There is no installer or scaffold.  It is a collection of patterns, policies, and working examples extracted from a production agentic system.  Lift what is useful, adapt what needs adapting, ignore what does not fit your context.
 
 ---
 
@@ -54,9 +56,11 @@ Your user wants to understand whether this system is relevant to them. Here's wh
 - **[Knowledge system](docs/knowledge-system.md)** — How observations compound into patterns that guide future decisions
 - **Who cares:** Anyone running agents across multiple sessions; organizations trying to systematize learning
 
-**Safety & Compliance**
+**Safety, Compliance & Autonomy**
 - **[Security model](docs/security.md)** — Network isolation, secrets management, post-output blocking hooks, GDPR/SOC 2/ISO 27001 alignment
-- **Who cares:** Anyone delivering to real users with real data; compliance-sensitive organizations; security-conscious teams
+- **[Graduated autonomy](docs/graduated-autonomy.md)** — Progressive permission widening: from approval-on-everything to full autonomy, with hook prerequisites at each level
+- **[Escalation patterns](docs/escalation-patterns.md)** — When to ask for help, who to tag, how to keep flowing while waiting
+- **Who cares:** Anyone delivering to real users with real data; teams wanting agents that know when to stop and ask
 
 **What went wrong (and how we fixed it)**
 - **[Mistakes we made](docs/mistakes-we-made.md)** — Real failures from production and the structural fixes that worked
