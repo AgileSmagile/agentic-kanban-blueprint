@@ -113,6 +113,48 @@ pass (encrypted, single source of truth)
 
 `.env` files are treated as runtime artefacts, not as the source of truth. They're gitignored, populated by a sync script, and can be regenerated at any time. The real secrets live in `pass`.
 
+### Per-agent API key isolation
+
+A single shared API key for all agents means any agent can act as any other agent on the board.  If one agent's key is compromised or rotated, every agent is affected.  Worse, audit trails cannot distinguish which agent performed an action.
+
+The better pattern: **one API key per agent role**, scoped to the permissions that role needs.
+
+```
+pass/
+├── boardtool/
+│   ├── orchestrator/api-key      ← orchestrator only
+│   ├── test-specialist/api-key   ← test specialist only
+│   └── project-agent/api-key     ← shared by all project agents
+```
+
+Project agents share a key because they have identical board permissions.  The orchestrator and test specialist get their own keys because they have elevated or distinct permissions (cross-project visibility, quality gate authority).
+
+**Sync targets map to roles, not projects:**
+
+```
+sync-env --target orchestrator       ← pulls orchestrator key
+sync-env --target test-specialist    ← pulls test-specialist key
+sync-env --target project-agents     ← pushes project-agent key to all project repos
+```
+
+The workflow for key rotation is: edit the key in `pass`, run `sync-env` for the affected target, done.  No manual `.env` editing.  No hunting across repos.
+
+**The board CLI should respect the environment:**  If `BOARDTOOL_API_KEY` (or equivalent) is already set in the environment, the CLI should use it.  If not, it falls back to reading the project `.env`.  This means agents that source their `.env` on startup automatically get the right key for their role without hardcoding paths.
+
+### Credential verification at startup
+
+Agents should verify their board credentials work before pulling work.  A bad key (expired, rotated, wrong role) produces silent failures: cards not created, comments not posted, moves rejected.  The agent continues working, unaware that its board operations are failing.
+
+Add a `verify` command to your board CLI:
+
+```bash
+board-cli verify
+# Output: OK (never echoes the key itself)
+# Or: FAILED — API returned 401 (key may need rotation; run sync-env)
+```
+
+Make this part of the agent startup routine.  If verify fails, the agent should stop and flag the issue rather than proceeding with broken board access.
+
 ### Agent secret disclosure prevention
 
 AI agents are language models. Their natural behaviour is to be helpful, which includes outputting information when asked. This makes them a disclosure risk for any secret they can access.

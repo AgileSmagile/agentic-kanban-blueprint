@@ -8,13 +8,14 @@ Sub-agents are **task-based, not persistent**. They're spun up, do focused work,
 
 ### Typical session flow
 
-1. PO arrives, orchestrator checks the board
-2. Brief on progress, blockers, decisions needed
-3. PO sets priorities
-4. Orchestrator dispatches agents in parallel
-5. Agents work independently, update the board as they go
-6. Orchestrator flags anything needing PO input
-7. Repeat
+1. Source project `.env` and verify board credentials (`board-cli verify`).  If verification fails, stop and flag the issue (run `sync-env` for your role, or alert the PO).  Do not proceed with broken board access.
+2. PO arrives, orchestrator checks the board
+3. Brief on progress, blockers, decisions needed
+4. PO sets priorities
+5. Orchestrator dispatches agents in parallel
+6. Agents work independently, update the board as they go
+7. Orchestrator flags anything needing PO input
+8. Repeat
 
 ### Autonomy summary
 
