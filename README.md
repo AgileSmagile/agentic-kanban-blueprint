@@ -228,7 +228,7 @@ Running this system has a startup tax: every session loads the CLAUDE.md, agent 
 |-----------|----------------|-------|
 | Satellite workspace (lightest) | ~230 lines / ~2,000 words | Scratch work, research, one-off tasks |
 | Product agent (typical) | ~220-380 lines / ~2,300-2,900 words | Delivery work within a specific project |
-| Orchestrator (heaviest) | ~860 lines / ~8,700 words | Full operating model, board integration, knowledge system, dispatch policies |
+| Orchestrator (heaviest) | ~860 lines / ~8,700 words | Full operating model, board integration, knowledge system, coordination policies |
 
 This is the trade-off for having autonomous agents that follow procedures without being prompted: the procedures have to be in context. The alternative is a lighter context window and more human steering, which defeats the point.
 

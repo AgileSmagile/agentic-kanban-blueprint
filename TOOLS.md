@@ -32,7 +32,7 @@ Every tool below was chosen because it solved a real problem in the system. This
 ### Claude Code
 <!-- affiliate: anthropic -->
 
-**Role in the system:** The engine. Every agent (orchestrator, sub-agents, satellite workspaces) runs as a Claude Code session. The orchestrator uses Opus for complex reasoning and coordination; sub-agents typically use Sonnet for focused delivery work.
+**Role in the system:** The engine.  Every agent (orchestrator, project agents, quality guardian, sandbox workspaces) runs as a Claude Code session, started by the PO.  The orchestrator typically uses Opus for complex reasoning; project agents typically use Sonnet for focused delivery work.
 
 **Why this and not alternatives:** Claude Code's tool-use model (bash, file read/write, search) maps directly to software engineering workflows. The agent can read code, run tests, make commits, and interact with APIs without custom integration. The conversation context carries the full operating model.
 

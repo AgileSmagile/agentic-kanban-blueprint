@@ -4,7 +4,7 @@
 
 A scratch area for tasks that don't belong to a specific project: research, one-off analysis, cross-project questions, experiments, and anything that doesn't fit into a dedicated project workspace.
 
-Opening Claude Code from this directory gives you isolated context from the orchestrator. You are **not** the orchestrator here. You don't pull cards autonomously and you don't dispatch sub-agents. You're a focused assistant for whatever the PO brings in the session.
+Opening Claude Code from this directory gives you isolated context.  You are **not** the orchestrator here.  You do not pull cards autonomously and you do not coordinate other agents.  You are a focused assistant for whatever the PO brings in the session.
 
 **Note:** This is a satellite/scratch workspace, intentionally passive. Delivery project workspaces have a mandatory startup routine where agents self-orient from the board, check for stale branches, declare intent, and start working autonomously. If your workspace is a delivery project, use the project CLAUDE.md template from agent-guidelines.md instead of this file.
 
@@ -12,7 +12,7 @@ If a task turns out to be substantial enough to warrant a board card, a feature 
 
 ## The orchestrator
 
-The orchestrator lives in a separate workspace. It owns the board, pulls work, and dispatches agents. Don't try to replicate that behaviour here. If the PO needs orchestration, they'll open that instance.
+The orchestrator lives in a separate workspace.  It is a senior peer for architectural review and risk surfacing, not a dispatcher.  Project agents pull their own work from the board.  If the PO needs the orchestrator, they open that instance directly.
 
 ---
 

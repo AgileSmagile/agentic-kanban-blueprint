@@ -26,10 +26,10 @@ The Kanban board and the knowledge system are the coordination layers. They don'
          │  (Claude Code,     │   │   (OpenClaw,  │  │  Agents        │
          │   local machine)   │   │    Pi 5,      │  │  (own board,   │
          │                    │   │    Discord)   │  │   own secrets, │
-         │  Dispatches:       │   │               │  │   own scope)   │
-         │  ├─ Product Agent  │   │  Advisory,    │  │                │
-         │  ├─ Website Agent  │   │  research,    │  │  May share     │
-         │  └─ Research Agent │   │  board mgmt   │  │  knowledge     │
+         │  Peer review,      │   │               │  │   own scope)   │
+         │  risk surfacing,   │   │  Advisory,    │  │                │
+         │  architectural     │   │  research,    │  │  May share     │
+         │  advice            │   │  board mgmt   │  │  knowledge     │
          └────────────────────┘   └───────────────┘  └────────────────┘
 ```
 
@@ -45,7 +45,7 @@ The production system this blueprint was extracted from runs multiple orchestrat
 
 | Orchestrator | Runtime | Where it runs | Primary focus |
 |-------------|---------|--------------|---------------|
-| **CC Orchestrator** | Claude Code (Opus) | Local machine (terminal) | Software delivery: dispatches sub-agents, manages PRs, runs CI |
+| **CC Orchestrator** | Claude Code (Opus) | Local machine (terminal) | Senior peer: architectural review, risk surfacing, knowledge hygiene, continuous improvement |
 | **Clawdius** | OpenClaw (Haiku) | Raspberry Pi 5 (Discord) | Strategy, research, advisory, board management, inter-agent coordination |
 | **Satellite workspaces** | Claude Code (Sonnet/Opus) | Local machine (separate terminals) | Focused work outside the main delivery flow |
 
@@ -56,7 +56,7 @@ Each orchestrator has its own persona, its own area of focus, and its own runtim
 - **The same secrets infrastructure** (`pass` store)
 - **The same codebase** (git repos)
 
-No orchestrator owns the board. No orchestrator owns the knowledge system. These are shared infrastructure that any orchestrator (or sub-agent) can read from and write to.
+No orchestrator owns the board.  No orchestrator owns the knowledge system.  These are shared infrastructure that any agent can read from and write to.
 
 **Important: multiple orchestrators here means different runtimes with different scopes — not two CC orchestrators running simultaneously against the same board.** Within any given runtime and scope, the rule is one instance per named role. Two CC orchestrators hitting the same cards creates conflicts (see [Mistakes we made](mistakes-we-made.md)). Two of the same project agent creates duplicate inbox handling. The multiplicity in the table above works because each orchestrator has a distinct focus area, runtime, and set of responsibilities. See [agent-communication.md](agent-communication.md) for the full multiplicity rules.
 

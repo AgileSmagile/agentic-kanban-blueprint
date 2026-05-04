@@ -2,20 +2,33 @@
 
 ## How This Works
 
-This workspace is the orchestration hub. The product owner works with the orchestrator here. The orchestrator dispatches sub-agents to work on specific projects in their own context windows.
+The human (product owner) spins up agents directly.  One orchestrator.  One quality guardian (or test specialist).  One instance of each project agent they are operating.  As many sandbox agents as they need for one-off tasks.  Each agent runs in its own context window.
 
-Sub-agents are **task-based, not persistent**. They're spun up, do focused work, update the board, and finish. The **Kanban board is the single source of truth** for all work across all initiatives. It provides continuity between sessions.
+**The orchestrator does not dispatch agents.**  That model was tried and abandoned early because it broke conversational continuity and turned the orchestrator into a bottleneck.  Instead, the orchestrator is a senior peer: an architectural sounding board for the PO, and available to project agents for peer review, independent assurance, and risk surfacing.  Project agents pull their own work from the board and deliver autonomously.
+
+The **Kanban board is the single source of truth** for all work across all initiatives.  It provides continuity between sessions.  Agents coordinate with each other through the board using the [inbox card pattern](../docs/agent-communication.md), not through the orchestrator.
+
+### Agent instances
+
+| Role | How many | Who starts it |
+|---|---|---|
+| Orchestrator | One per board scope | The PO |
+| Quality Guardian / Test Specialist | One | The PO |
+| Project agent (per domain) | One per domain | The PO |
+| Sandbox / satellite agent | Unlimited | The PO (or another agent for one-off tasks) |
+
+Each named agent has its own API key (see [per-agent key isolation](../docs/security.md#per-agent-api-key-isolation)), its own inbox prefix, and its own context window.  They do not share sessions.
 
 ### Typical session flow
 
 1. Source project `.env` and verify board credentials (`board-cli verify`).  If verification fails, stop and flag the issue (run `sync-env` for your role, or alert the PO).  Do not proceed with broken board access.
-2. PO arrives, orchestrator checks the board
-3. Brief on progress, blockers, decisions needed
-4. PO sets priorities
-5. Orchestrator dispatches agents in parallel
-6. Agents work independently, update the board as they go
-7. Orchestrator flags anything needing PO input
-8. Repeat
+2. Check the board: what is in progress, what is blocked, what is ready to pull
+3. Check inbox for messages from other agents
+4. If the PO is present: brief on progress, blockers, decisions needed
+5. Pull work from the board and deliver autonomously
+6. Coordinate with other agents via the board when needed (not through the orchestrator)
+7. Flag anything needing PO input via card comments with @mention
+8. At session end: run `/lets-wrap`
 
 ### Autonomy summary
 
