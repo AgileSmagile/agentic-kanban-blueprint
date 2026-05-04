@@ -216,6 +216,44 @@ Voice input in particular consumes a high volume of tokens. If you're dictating 
 
 Matching the model to the task isn't just about cost. Lighter models respond faster and are less likely to overthink straightforward problems.
 
+## Three Amigos: you are not alone in this
+
+Everything above frames the human as a solo decision-maker.  That is true for strategic direction and prioritisation.  But for the operational decisions that shape delivery, you have peers.
+
+In this system, three roles form a standing relationship:
+
+- **The product owner (you):** owns strategy, priorities, acceptance criteria, and validation
+- **The orchestrator:** owns architecture, cross-project coherence, knowledge synthesis, and continuous improvement of the system itself
+- **The quality guardian:** owns security, compliance, test strategy, and the authority to block a ship when standards are not met
+
+These three are not a committee.  They do not meet regularly.  They are a relationship that activates when it needs to: when an initiative is about to enter active delivery, when scope is ambiguous, when risk needs surfacing, when a decision affects more than one project.
+
+### The initiative checkpoint
+
+Before an initiative moves from planning into Now (active delivery), the Three Amigos should be aligned on three things:
+
+1. **What problem is this solving and how will we know it is solved?**  The PO owns this, but the orchestrator may surface architectural constraints and the quality guardian may surface compliance requirements that reshape the acceptance criteria.
+2. **What are the risks?**  Security, data, architectural debt, cross-project dependencies.  The quality guardian and orchestrator see things the PO does not.
+3. **Is this the right size?**  An initiative that cannot realistically complete within the service level expectation needs to be broken down before it enters Now.  The orchestrator has the cross-project context to judge this.
+
+This is not a gate for every card.  Project agents decompose initiatives into cards and deliver autonomously.  The Three Amigos operate at initiative level: the strategic decisions that shape what gets built and how done is measured.
+
+### Three standing responsibilities
+
+Beyond the initiative checkpoint, the Three Amigos relationship serves three ongoing functions:
+
+**Enforcement of mandatory practices.**  The quality guardian enforces compliance and security standards.  The orchestrator enforces operating model discipline.  Neither waits for the PO to ask.  If a standard is being violated, they raise it.
+
+**Continuous improvement of the system.**  Agents surface improvement ideas through their session wrap-ups.  The orchestrator triages these.  Changes to the operating model, knowledge system, or tooling that affect the whole estate are Three Amigos decisions, not unilateral changes.
+
+**Knowledge sharing.**  The orchestrator synthesises learning across projects.  The quality guardian propagates security and testing patterns.  The PO provides the business context that makes that learning actionable.  This is how the system gets smarter across domains, not just within them.
+
+### Why this matters for you
+
+Without this relationship, you are the only person who sees the whole picture.  Every architectural question, every quality concern, every cross-project dependency routes through you.  You become the bottleneck you built the system to avoid.
+
+With it, you have two agent peers who carry operational context you do not have time to maintain, who can answer questions from project agents without involving you, and who will push back when your priorities create risk you have not considered.  The system scales because the decision-making does.
+
 ## The bargain
 
 You get extraordinary leverage: multiple AI agents delivering work in parallel, 24 hours a day, learning from session to session. In return, you commit to being a responsible owner of the system: setting direction, maintaining quality standards, honouring your legal obligations, and staying close enough to the product to catch drift before it compounds.

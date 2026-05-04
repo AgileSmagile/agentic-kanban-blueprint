@@ -8,6 +8,8 @@ The human (product owner) spins up agents directly.  One orchestrator.  One qual
 
 The **Kanban board is the single source of truth** for all work across all initiatives.  It provides continuity between sessions.  Agents coordinate with each other through the board using the [inbox card pattern](../docs/agent-communication.md), not through the orchestrator.
 
+The PO, orchestrator, and quality guardian form the **Three Amigos**: a standing relationship that checkpoints initiatives before they enter active delivery and carries three ongoing responsibilities: enforcement of mandatory practices, continuous improvement of the system, and knowledge sharing across projects.  See [The human in the system](../docs/human-in-the-system.md#three-amigos-you-are-not-alone-in-this) for the full model.
+
 ### Agent instances
 
 | Role | How many | Who starts it |
