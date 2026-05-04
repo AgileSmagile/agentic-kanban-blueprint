@@ -129,3 +129,67 @@ If your system requires faster agent-to-agent response, you need a different com
 **Cascade.** If an agent's response comment triggers the Board Watcher to notify another agent, and that agent's response triggers the first agent again, you get an infinite loop. Prevention: agent responses must use a prefix that cannot match the detection pattern. In the reference implementation, responses use `[notification/Agent-X]` (contains a slash) which the Board Watcher regex explicitly excludes.
 
 **Scanned column scope.** The Board Watcher only scans comments on cards in specific columns (Doing, Done, Validation/Rework in the reference implementation). A comment on a card in Backlog, Ready, or Shipped will not create an inbox card. This is intentional — completed work should not generate new coordination overhead — but it can surprise agents who post a routing comment on the wrong card.
+
+## Practical implementation
+
+The pattern above is tool-agnostic. This section documents the concrete implementation used in the reference system, including gotchas discovered in production.
+
+### Posting comments on existing cards
+
+The primary communication path. When working on a card and you need input from another agent:
+
+```bash
+# Post a comment with a routing prefix
+bmap comment <card_id> '[Orchestrator] Question about cross-project dependency'
+
+# Or use an @mention for named agents
+bmap comment <card_id> '@Agent-TestSpecialist please review the auth changes in this PR'
+```
+
+### Creating standalone inbox cards
+
+When the communication is not attached to an existing work item:
+
+```bash
+# Create a card directly in the inbox column
+bmap create "[Prefix] Title of notification" <inbox_col> <lane_id> <workflow_id>
+
+# Add detail as a follow-up comment
+bmap comment <card_id> 'Detail about what was done, why it matters, and what the recipient should know'
+```
+
+Use standalone inbox cards for:
+- Sharing a new practice or architectural decision that affects the estate
+- Raising a continuous improvement idea
+- Asking a question that does not belong on any existing card
+- Notifying agents of something they need to know but are not currently working on
+
+### Shell escaping: the single-quote rule
+
+The `bmap comment` command passes text through shell arguments into a JSON payload via a Node.js helper. This creates a serialisation boundary that breaks on special characters.
+
+**Always use single quotes** around comment text. Double-quoted strings containing parentheses, em dashes, or other special characters cause JSON serialisation failures (HTTP 400, error code VE03: "request body is not valid json").
+
+```bash
+# Works
+bmap comment 1087 'New practice rolled out: Husky + coverage thresholds across the estate'
+
+# Breaks (parentheses in double quotes)
+bmap comment 1087 "New practice rolled out (Husky + coverage thresholds) across the estate"
+```
+
+**Keep comments to a single line.** Multi-line text passed through shell arguments breaks the JSON payload. If you need to communicate complex detail, post multiple short comments rather than one long one.
+
+This is a known limitation of passing text through shell-to-JSON boundaries. If your implementation uses a different board tool API wrapper, test the escaping behaviour before relying on it for agent communication.
+
+### When to use which mechanism
+
+| Situation | Mechanism |
+|---|---|
+| Need input on a card you are working on | Comment on that card with prefix or @mention |
+| Sharing a decision or practice with the estate | Inbox card with recipient prefix |
+| Asking for information you cannot find | Comment on your card, or inbox card if no card exists |
+| Continuous improvement idea from session wrap | Inbox card (session wrap skill handles this) |
+| Escalating a blocker to the human | Block the card with native block functionality and add a comment |
+
+**The default should be self-service.** If the orchestrator or another agent can answer a question, use the board. The human owns strategy and priorities; agents own coordination.

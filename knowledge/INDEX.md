@@ -7,6 +7,7 @@ Load this before starting any card. Identify relevant domains, read their rules.
 | Domain | What it covers | When to consult |
 |--------|---------------|-----------------|
 | [prokanban](prokanban/) | Flow principles, WIP theory, board operating model, Kanban methodology | Board decisions, WIP management, flow problems, agentic experiment |
+| [quality-engineering](quality-engineering/) | Mechanical enforcement, coverage thresholds, hook infrastructure, test debt patterns | Quality gates, test infrastructure, CI/CD decisions, audit preparation |
 
 <!-- Add your own domains as the system grows. Examples:
 | [your-product](your-product/) | Product principles, design, domain logic | Any product feature work or UX decisions |

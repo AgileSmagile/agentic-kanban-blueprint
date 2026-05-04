@@ -1,5 +1,56 @@
 # Release Notes
 
+## v1.4.0 — Agent-to-agent communication and quality engineering
+
+**Release date:** 2026-05-04
+
+### What changed
+
+**1. Agent-to-agent communication** *(new)*
+- Added `docs/agent-communication.md`: the inbox card pattern for asynchronous agent coordination without shared context windows
+- Covers: agent multiplicity rules (one named agent per prefix, unlimited sandbox agents), the `[prefix]` routing convention, Board Watcher detection logic, three-tier polling intervals, `/watch-card` protocol for active dialogue, initiative wakeup via title prefix, shell escaping gotchas, practical implementation examples, and five known failure modes
+- README updated with new section 7: "Agents can talk to each other" with full flow diagram
+- AGENT.md updated: inbox check on startup, agent comms in research guide, flow diagram expanded with inbox poll and `/watch-card`
+- `docs/mistakes-we-made.md` adds Mistake #9: assuming the board tool fires comment webhooks (it doesn't for comments; two-day debugging story and the fix-forward to polling)
+- `docs/architecture.md` updated with multiplicity clarification
+
+**2. Quality engineering knowledge domain** *(new)*
+- Added `knowledge/quality-engineering/` with rules, hypotheses, and observations
+- Six promoted rules: Husky for committed hooks, pre-commit typecheck, pre-push tests, coverage ratchets, CI as authoritative gate, no `--no-verify`
+- Three hypotheses in testing: mechanical gates reduce regressions, coverage ratchets prevent debt, projects without test infra accumulate more findings
+- Five observations from the SW-v2 estate rollout
+- `knowledge/INDEX.md` updated to register the new domain
+
+**3. Mechanical enforcement in quality gates** *(expanded)*
+- `docs/quality-gates.md` extended with a "Mechanical Enforcement" section documenting Husky, hook configuration, coverage thresholds, and CI as the backstop
+- Links to the new quality-engineering knowledge domain for the full rule set
+
+**4. Knowledge inbox pattern retired**
+- Removed `knowledge/inbox/` directory.  Knowledge observations now go directly into the relevant domain files, not into an inbox folder awaiting processing.  The only "inbox" in this system is a column on the Kanban board.
+
+### Why this matters
+
+- **Agents can coordinate without a human in the middle.**  The inbox card pattern is production-proven and genuinely unusual in the field.  Most multi-agent systems require synchronous orchestration or put a human in the routing path.
+- **Quality enforcement is mechanical, not instructional.**  Hooks that survive clone, coverage thresholds that ratchet, CI that cannot be bypassed.  Policy tells agents what to do; gates stop them when they don't.
+- **The knowledge system has a second domain.**  Quality engineering joins ProKanban as a domain with rules, hypotheses, and observations that compound across agents and sessions.
+
+### Action for teams using this blueprint
+
+- **Multi-agent teams:** Read `docs/agent-communication.md` for the inbox card pattern.  If you're running more than one agent, this is how they talk to each other.
+- **Quality enforcement:** Consider adopting Husky + coverage thresholds from the quality-engineering rules.  The pattern is framework-agnostic.
+- **Knowledge inbox users:** If you adopted the `knowledge/inbox/` pattern from earlier versions, migrate to writing observations directly into domain files.
+
+### No breaking changes
+
+All existing implementations continue to work.  The inbox directory removal is a pattern change only.
+
+### Commits
+
+- `5520674` — Add agent-to-agent communication documentation
+- `[pending]` — Quality engineering domain, practical implementation notes, mechanical enforcement, inbox removal
+
+---
+
 ## v1.3.0 — Responsible autonomy, escalation patterns, and identity clarity
 
 **Release date:** 2026-05-02

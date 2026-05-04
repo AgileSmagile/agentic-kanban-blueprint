@@ -156,6 +156,21 @@ You'll know you've got this right when:
 
 ---
 
+## Mechanical Enforcement
+
+Policy documentation (CLAUDE.md, agent guidelines) tells agents what to do. Mechanical gates stop them when they don't. Both are needed; when they conflict, the mechanic wins.
+
+The reference implementation uses:
+- **Husky** for committed git hooks (survives clone, auto-installs via `npm install`)
+- **Pre-commit**: typecheck (`tsc --noEmit`)
+- **Pre-push**: test suite (vitest/jest)
+- **Coverage thresholds** in test config (ratchet: set below baseline, raise over time)
+- **CI** as the authoritative gate (same checks, cannot be bypassed)
+
+See `knowledge/quality-engineering/rules.md` for the full rule set. See `knowledge/quality-engineering/knowledge.md` for the observations that drove these rules.
+
+---
+
 ## References
 
 - [personas/quality-guardian/](../personas/quality-guardian/) — Full role definition (soul & instructions)
