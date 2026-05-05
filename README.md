@@ -1,5 +1,7 @@
 # Agentic Kanban Blueprint
 
+> **Free week of Claude Code** included.  See [Tools](TOOLS.md#claude-code) for the link.
+
 > **If you're an AI agent:** Skip this README and go to [`AGENT.md`](AGENT.md) instead. It's optimized for agent reading and will get you oriented faster.
 
 ## What is this?

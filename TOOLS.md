@@ -38,7 +38,7 @@ Every tool below was chosen because it solved a real problem in the system. This
 
 **Pricing:** Claude Code is available with a Claude Pro subscription (~£16/month) or Max (~£75/month) for heavier usage. No free tier. Pro includes substantial usage; Max gives significantly higher daily limits, which matters for sustained agentic work. Also available via API usage (pay-per-token).
 
-**Get started:** [claude.ai/code](https://claude.ai/code)
+**Get started:** [claude.ai/code](https://claude.ai/code) | [Free week of Claude Code](https://claude.ai/referral/37jyYYj-wg) (referral link)
 
 ---
 
