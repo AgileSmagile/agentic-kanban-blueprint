@@ -285,6 +285,9 @@ If you do decide to use any of the tools referenced here, using the affiliate li
 
 - **[Businessmap](https://businessmap.io/signup-partners?referral_code=smagile30referral)** — this link gives you a 30-day free trial (their public site offers 14 days).  If you would like a 90-day trial, [request one here](<!-- TODO: n8n form URL -->) and I will send it straight to your inbox.
 - **[UptimeRobot](https://uptimerobot.com/?rid=5999e69f2482fe)** — free tier is generous; the link supports this project at no cost to you.
+- **[Claude Code free week](https://claude.ai/referral/37jyYYj-wg)** — referral link for a free trial week of Claude Code, the AI agent platform this system is built on.
+
+The accompanying [Agentic Kanban Blueprint blog series](https://smagile.co/resources/blog/?series=Agentic%20Kanban%20Blueprint%20(AKB)) covers the ideas in this repo in more depth, including how the system was built and the mistakes made along the way.
 
 That's it.  No pressure, no expectation.  The blueprint is the thing; the rest is a bonus.
 
