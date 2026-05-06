@@ -164,6 +164,34 @@ Widening permissions does not change the autonomy model in the [agent guidelines
 
 The difference is enforcement mechanism.  At Level 0-1, the tool itself prevents the agent from acting without approval.  At Level 3-4, the agent's instructions and your hooks provide the guardrails.  The boundaries are the same; what changes is who enforces them.
 
+## Conversational autonomy: the other permission problem
+
+Tool permissions control what agents *can* do.  Conversational autonomy controls what agents *will* do without asking.  These are different problems, and solving only the first creates a system where agents have bypass-level permissions but still ask "Should I start working on this?" before every action.
+
+This is the more insidious friction.  A tool permission prompt is a modal dialogue; you click Allow and move on.  A conversational permission request ("Would you like me to proceed?", "Should I do A or B?") is worse: it requires you to context-switch, read the question, form an opinion, and type a response.  Multiply by ten agents across a working day and you've rebuilt the approval bottleneck that autonomy was supposed to eliminate.
+
+**The root cause:** LLMs are trained to be helpful and cautious.  Their default is to seek confirmation.  Instructions like "use intent-based leadership" or "don't wait for approval" are too abstract; agents interpret them as "state intent, then wait for acknowledgement" rather than "state intent, then execute."
+
+**What works:**
+
+1. **Banned phrases.** Explicitly list the conversational patterns you don't want: "Should I...", "Would you like me to...", "Ready when you are", "Let me know if...".  These phrases transfer agency back to the human and create unnecessary round-trips.  Banning them is blunt but effective.
+
+2. **A decision test.** Give agents a heuristic: "Would a competent senior engineer on this team ask their tech lead this question, or would they just do it?"  If a senior engineer would just do it, the agent should just do it.
+
+3. **Explicit pause criteria.** Instead of vague "confirm when appropriate", list the only valid reasons to stop and ask:
+   - A product decision that genuinely cannot be inferred from documentation
+   - An irreversible action affecting production or shared infrastructure
+   - An architectural choice with cross-project consequences
+   - A card description too ambiguous to start (after checking all available docs)
+
+   Everything else: declare intent, execute.
+
+4. **Reinforcement in every project file.** Agents load their project's CLAUDE.md on every session start.  A short, direct autonomy rule in that file is worth more than a paragraph buried in a shared guidelines document.  Format: two sentences, no hedging, no explanation of why.  The guidelines doc has the reasoning; the CLAUDE.md has the rule.
+
+**The pattern that emerges:** agents that ask too many questions are not being cautious; they are being lazy.  Asking transfers cognitive load to the human.  Making a decision and being wrong is cheaper than interrupting the human ten times a day.  If an agent makes a bad call, the board and git history make it visible and reversible.  If an agent asks permission for routine work, the time lost is gone forever.
+
+**Escalation path:** If you find that agents continue to ask despite clear instructions, escalate the language.  "Intent-based leadership" becomes "banned phrases."  Guidelines become critical rules.  The goal is not to be aggressive; it's to be unambiguous enough that the model has no room to interpret "don't ask" as "ask politely."
+
 ## Choosing your level
 
 There is no universal right answer.  Consider:

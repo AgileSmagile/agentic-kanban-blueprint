@@ -315,12 +315,40 @@ exit 0
 
 Both hooks run in the Claude Code harness, not in the agent's context window.  The agent cannot disable, override, or forget them.  This is the critical difference between instruction-level and mechanical enforcement.
 
+**Why block, not redact?**
+
+PostToolUse hooks in Claude Code can only allow (exit 0) or block (exit 2).  There is no mechanism to return modified output with secrets masked.  This means you cannot surgically replace a token with `[REDACTED]` and pass the rest through; it's all or nothing.
+
+This sounds harsh, but it's actually safer.  Redaction trusts a regex to catch and mask the secret before it enters the conversation context.  If the regex misses, the secret is exposed.  Blocking means the secret never enters the conversation at all.  The agent gets an error message on stderr explaining what happened, and can retry the command without requesting the sensitive field.
+
+The trade-off: the agent loses potentially useful non-secret information in the same output.  In practice this is rarely a problem.  If a Cloudflare API response contains both a tunnel secret and a status field, the agent can re-query for just the status.
+
+**Expanding pattern coverage:**
+
+The minimal example above catches three patterns.  In production, you'll need more.  External APIs (Cloudflare, AWS, Stripe, your board tool) return credentials in JSON responses that agents didn't explicitly request.  Common patterns to add:
+
+- **Cloudflare API tokens**: `v1.0-` followed by 40+ hex characters
+- **Cloudflare tunnel credentials**: JSON containing `"TunnelSecret"` with a value
+- **Generic JSON secret fields**: keys named `secret`, `apiKey`, `api_key`, `password`, `access_token`, `client_secret`, `private_key`, `webhook_secret` with values longer than 20 characters
+- **Bearer tokens**: `Bearer ` followed by 30+ alphanumeric characters
+- **JWTs**: three dot-separated base64 segments starting with `eyJ`
+- **Board/service API keys in JSON**: `"apikey"` fields with 40+ character values
+
+Each pattern has a false-positive risk.  JWTs in particular appear in legitimate contexts (decoding a JWT to inspect claims is a valid debugging step).  Tune for your environment; start aggressive and relax if specific patterns cause too much friction.
+
+**The inbound secret problem:**
+
+A subtle case: you explicitly block agents from reading `.env` files, but an external API call can return secrets the agent didn't ask for.  Running `cloudflared tunnel info` might output tunnel credentials.  Querying your board API might return an API key in the response body.  The agent didn't do anything wrong; the external system volunteered the secret.
+
+This is why PostToolUse scanning is essential even with perfect PreToolUse blocking.  PreToolUse prevents the agent from deliberately accessing secrets.  PostToolUse catches secrets that arrive uninvited.
+
 **Limitations:**
 - Won't catch every possible secret shape (tokens with irregular formats, custom enterprise credentials)
 - Can produce false positives (valid output that happens to match a pattern)
 - Requires maintenance as new services and secret formats emerge
+- Cannot redact; can only block entirely (Claude Code hook architecture limitation)
 
-**Best practice:** Combine the hook with the instruction ("never display secrets"), the architecture-level practice (secrets in `pass`, not in files), and the pre-push scan. Layers compound.
+**Best practice:** Combine the hook with the instruction ("never display secrets"), the architecture-level practice (secrets in `pass`, not in files), and the pre-push scan. Layers compound.  Accept that no single layer is perfect; the combination is what makes the system trustworthy.
 
 ### Recommendations
 
