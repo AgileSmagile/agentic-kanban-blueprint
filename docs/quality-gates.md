@@ -173,6 +173,7 @@ See `knowledge/quality-engineering/rules.md` for the full rule set. See `knowled
 
 ## References
 
+- [test-depth-model.md](test-depth-model.md) — Five-level test depth model and agentic-specific testing practices
 - [personas/quality-guardian/](../personas/quality-guardian/) — Full role definition (soul & instructions)
 - [architecture.md](architecture.md) — How agents fit into the overall system
 - [human-in-the-system.md](human-in-the-system.md) — When humans intervene and why

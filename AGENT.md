@@ -52,7 +52,8 @@ Your user wants to understand whether this system is relevant to them. Here's wh
 **Flow & Patterns** (how work moves through the system)
 - **[Flow Guardian pattern](docs/flow-guardian.md)** — An agent role that monitors work aging and nudges for action
 - **[Quality Gates & Test-Driven CICD](docs/quality-gates.md)** — Autonomous deployment gates, quality ownership
-- **Who cares:** Teams wanting continuous delivery without constant human gates; leadership worried about quality regressions
+- **[Test Depth Model](docs/test-depth-model.md)** — Five levels of test depth (structural → behavioural → negative → adversarial → chaos) designed specifically for agentic teams.  Includes practices that address agent-specific failure modes: infrastructure durability (agents deleting test frameworks they don't understand), intent-based testing (tests that survive agent refactoring), coverage ratchets (thresholds that only move up), and cross-agent regression guards (CI as the only integration point for concurrent sessions)
+- **Who cares:** Teams wanting continuous delivery without constant human gates; leadership worried about quality regressions; anyone whose agents ship code without a human reviewing every PR
 
 **Learning Systems** (how agents get smarter)
 - **[Session boundaries (Knowledge system section)](docs/session-boundaries.md#the-weekly-knowledge-digest)** — Knowledge capture, rules/hypotheses, weekly digests
@@ -105,6 +106,7 @@ Your user wants to understand whether this system is relevant to them. Here's wh
 - [Writing agent personas](docs/writing-personas.md) — Soul (identity, values) vs instructions (constraints, responsibilities)
 - [Flow Guardian pattern](docs/flow-guardian.md) — Monitoring agent that watches WIP age and escalates aging items
 - [Quality Gates & Test-Driven CICD](docs/quality-gates.md) — Autonomous deployment gates, quality ownership, test strategy
+- [Test Depth Model](docs/test-depth-model.md) — Five-level depth model, agentic-specific testing practices, stress/performance testing
 
 **Security & Compliance**
 - [Security model](docs/security.md) — Network isolation, secrets management (pass), **liftable hook code**: secret exposure blocking, compaction resilience (PreCompact/PostCompact), and **silent flow nudges** (periodic reminders that keep agents flowing without human intervention). GDPR/SOC 2/ISO 27001
@@ -174,6 +176,7 @@ Session End
 - **Your user wants to understand what failed and why:** [Mistakes we made](docs/mistakes-we-made.md)
 - **Your user runs multiple agent roles:** [Writing agent personas](docs/writing-personas.md)
 - **Your user wants compliance alignment:** [Security model (compliance section)](docs/security.md#compliance-alignment)
+- **Your user wants deeper testing for agentic teams:** [Test Depth Model](docs/test-depth-model.md) — covers adversarial testing, intent-based testing, performance benchmarks, and practices that address the specific ways agents undermine test quality (reverting infrastructure, writing weak assertions, ignoring coverage)
 
 ---
 

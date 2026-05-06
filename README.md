@@ -182,6 +182,7 @@ Then go deeper on the areas that interest you:
 5. **[Hardware and self-hosting](docs/hardware.md)** -- running on your own hardware instead of paying for cloud
 6. **[Flow Guardian pattern](docs/flow-guardian.md)** -- an agent that monitors flow health and nudges for action on aging items
 7. **[Quality Gates & Test-Driven CICD](docs/quality-gates.md)** -- how to make tests enable autonomous deployment, and the Quality Guardian role that owns quality and risk
+   7a. **[Test Depth Model](docs/test-depth-model.md)** -- five levels of test depth designed for agentic teams, from structural to chaos testing.  Includes practices that do not exist in human testing: infrastructure durability, intent-based testing, coverage ratchets, and cross-agent regression guards
 8. **[Cross-runtime compatibility](docs/cross-runtime.md)** -- using the same files across different AI platforms
 9. **[How do you know it's working?](docs/measuring-health.md)** -- three signals to check at 5, 10, and 20 sessions
 10. **[Graduated autonomy](docs/graduated-autonomy.md)** -- how to progressively widen agent permissions as you add mechanical safety (settings.json levels, hook prerequisites, Claude Code vs OpenClaw)
