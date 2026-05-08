@@ -143,6 +143,88 @@ This means you should be deliberate about what persists and where:
 - **Knowledge files grow.** Review domain knowledge periodically and prune entries that are no longer relevant. A knowledge file with 200 entries is a tax on every session, even if 180 entries are stale.
 - **CLAUDE.md should stay lean.** If your CLAUDE.md is over 100 lines, some of it probably belongs in a referenced document (architecture.md, deployment.md) rather than inline. CLAUDE.md is loaded into every session; referenced documents are loaded only when relevant.
 
+## Mid-session continuity: the compaction snapshot
+
+The persistence layers above (card comments, knowledge files, CLAUDE.md) all assume a clean session boundary: work ends, agent writes, agent exits. But context compaction introduces a different failure mode. Compaction does not end the session — it truncates the context window mid-flight to free capacity. The agent continues, but with a compressed summary instead of the full conversation. Whatever was in working memory but not yet written anywhere is gone.
+
+The standard advice ("write to knowledge files as you go") helps but does not fully solve this. An agent mid-task has not yet reached a natural checkpoint. It knows what it just decided, what it was about to do next, and what the open questions are. None of that is on the board yet. None of it is in a knowledge file. It was going to be written at the end of the card.
+
+Compaction fires before that end arrives.
+
+### The fix: a pre-compaction snapshot
+
+Claude Code supports a `PreCompact` hook that fires immediately before context is compressed. If the hook is a `prompt` type (not a `command` type), it injects a user turn into the live conversation — which means the agent has full context and full tool access when it fires. The agent can write a file.
+
+The pattern:
+
+1. **PreCompact prompt hook** instructs the agent to write a snapshot to a fixed file path (e.g. `~/.claude/hooks/.session-snapshot.md`) before compaction proceeds. The agent writes: cards in flight, their current state, decisions made but not yet committed anywhere, the exact next action, open questions.
+
+2. **Compaction happens.** Context is compressed to a summary.
+
+3. **PostCompact prompt hook** instructs the agent to read the snapshot file and re-establish working context. The agent continues from where it left off, not from a cold start.
+
+The snapshot file is overwritten on each compaction. It is not a log; it is a single point-in-time capture of working state. Between compactions it sits on disk doing nothing. It persists across sessions too — if a session ends abruptly without a wrap-up, the snapshot from the last compaction is still there.
+
+### Why prompt type, not command type
+
+A `command` hook executes a shell script. Shell scripts can write files, but they cannot access the conversation context — they only know that a hook fired. Any "snapshot" they write is generic and static.
+
+A `prompt` hook injects a user turn. The agent sees the prompt with full awareness of what it was doing. It writes a snapshot that is specific, accurate, and actionable. This is the meaningful difference.
+
+### What the snapshot should contain
+
+Be specific. Generic summaries are useless after compaction.
+
+```markdown
+# Session Snapshot — 2026-05-08 01:30
+
+## Cards in flight
+- #1224 [SW-v2] Blue-green health check — in Doing (col 150). Added retry logic, 3 attempts with exponential backoff. PR not yet raised. Next: run tests, raise PR, update card with PR link.
+- #969 Mosaic deploy pipeline — in Backlog. Description still empty; needs filling from comment #675. E: path corrected. Waiting on James for deploy pipeline status.
+
+## Decisions made, not yet in memory
+- Initiative Done column is col 85 (not 32 which is cards-workflow only). Confirmed when move 148 → 32 failed with C102.
+
+## Next action
+Resume #1224: run `npm test`, raise PR against main.
+
+## Open questions
+- James has not yet responded to #1205 three-card split recommendation.
+```
+
+### Configuration (Claude Code)
+
+In `settings.json`:
+
+```json
+"PreCompact": [
+  {
+    "matcher": "",
+    "hooks": [
+      {
+        "type": "prompt",
+        "prompt": "Context compaction is about to occur. Before it does, write a session-state snapshot to ~/.claude/hooks/.session-snapshot.md using the Write tool.\n\nInclude: cards in flight (IDs, titles, state, next action), decisions not yet in memory, the exact next action, unresolved blockers, any discoveries not yet written to knowledge files. Be specific — card IDs, file paths, column numbers. Generic summaries are useless after compaction.\n\nWrite the file now, then compaction will proceed.",
+        "timeout": 60
+      }
+    ]
+  }
+],
+"PostCompact": [
+  {
+    "matcher": "",
+    "hooks": [
+      {
+        "type": "prompt",
+        "prompt": "Context compaction just completed. Read the session-state snapshot now: ~/.claude/hooks/.session-snapshot.md\n\nIncorporate it into your working context and continue from where you left off. Do not restart, do not re-introduce yourself, do not ask what to do next.",
+        "timeout": 30
+      }
+    ]
+  }
+]
+```
+
+Create a placeholder at the snapshot path so the PostCompact read does not error in sessions where no compaction has yet occurred.
+
 ## The handoff test
 
 After writing a card comment or knowledge entry, apply this test: if a completely fresh agent read this with zero prior context, could it continue the work or apply the learning correctly?
