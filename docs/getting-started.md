@@ -9,6 +9,56 @@ Here's what the first hour looks like:
 3. **Write agent guidelines** covering card standards and autonomy boundaries (15 mins)
 4. **Create your first card and let the AI work** (20 mins)
 
+## Start here: let your AI read this for you
+
+If you already have an AI assistant running, the fastest way to get value from this blueprint is to let it do the reading.  Point it at the repository with one of the prompts below, fill in the relevant context, and it will surface what matters for your situation.
+
+---
+
+**If you already have agents running**
+
+Paste this into an existing Claude Code session (or equivalent), where the agent already knows your system:
+
+> Review the Agentic Kanban Blueprint at:
+> https://github.com/AgileSmagile/smagile-agentic-kanban-blueprint
+>
+> Read it cold.  Using what you already know about our system, compare it against how we work today.  Surface:
+> - The three patterns most worth borrowing, ranked by impact on our current gaps
+> - What we already do that the blueprint validates
+> - What to skip or deprioritise given our context
+> - The single best place to start
+>
+> Be specific.  Name our actual tools and setup.  Don't describe the blueprint in general terms; describe what it means for us.
+
+---
+
+**If you are starting from zero**
+
+Paste this into Claude.ai, ChatGPT, or whichever AI you already use.  Fill in the four lines before you send it:
+
+> Review the Agentic Kanban Blueprint at:
+> https://github.com/AgileSmagile/smagile-agentic-kanban-blueprint
+>
+> My situation:
+> - I am: [solo / small team / large org]
+> - What I do: [one sentence]
+> - What I want AI to help me with: [one sentence]
+> - Tools I already use: [board tool, any AI tools, anything else relevant]
+>
+> Assume I have no existing agentic setup.  I am starting from zero.
+>
+> Read the repo.  Tell me:
+> 1. Which three patterns are most relevant to my situation, and why
+> 2. What to ignore for now
+> 3. What I would need to get started, and roughly how much effort
+> 4. The single first thing to do
+>
+> I'm not starting from scratch.  This blueprint is my foundation.  Help me understand which parts to pick up first, and in what order.
+
+---
+
+If you prefer to read it yourself, continue below.
+
 ## Before you start
 
 ### What you'll need
