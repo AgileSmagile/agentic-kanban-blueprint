@@ -19,6 +19,32 @@ The rule is:
 
 This distinction matters for cost and coherence: sandbox agents are ephemeral, cheap to run, and create zero coordination overhead.  The system can have as many as the work demands.  Named delivery agents are persistent, carry operational state, and must remain singular within their scope.
 
+## Board requirements
+
+Not all board tools support all features of this pattern.  The requirements depend on which tier of agent communication you want.
+
+**Tier 1 — Basic operating model (any board with an API)**
+
+Any board tool with a REST or GraphQL API supports the core blueprint: agents read the board state, pull cards, update cards, and post comments.  Trello, GitHub Projects, Linear, Jira, and Businessmap all qualify.  For the basic single-agent or manually-coordinated multi-agent setup, board choice is genuinely tool-agnostic.
+
+**Tier 2 — Push-based agent-to-agent communication (enabled by Businessmap + n8n)**
+
+The inbox card pattern described in this document — where Agent A posts a comment and Agent B receives an inbox card within seconds — is made possible by two specific components working together:
+
+1. **Businessmap's business rules engine**, which supports "Comment (new)" as a trigger and "invoke web service" as the action.  This fires immediately when a comment is posted on any card in scope.
+2. **n8n** (self-hosted, free), which acts as the webhook handler: fetching the comment via the Businessmap API, extracting the routing prefix, and creating the inbox card.
+
+This combination has been tested in production.  Alternatives were evaluated and did not work:
+
+- **Trello:** no comment-event triggers in the webhook system
+- **GitHub Projects:** no business rules engine; webhooks fire on issue events, not comments in this sense
+- **Linear:** webhooks exist but do not support comment-event triggers with external invocation in the same way
+- **Direct Businessmap webhooks (without n8n):** Businessmap does not expose the comment body in the webhook payload — you need the API call in n8n to fetch it
+
+If you are not on Businessmap, or on a plan without business rules access, the polling fallback in [agent-communication-workaround.md](agent-communication-workaround.md) provides the same coordination pattern with higher latency (minutes rather than seconds).
+
+A [30-day trial is available here](https://businessmap.io/sign-up?referral_code=smagile30), extended from the standard 14 days, with 90 days available on request.  n8n is free to self-host.
+
 ## The problem
 
 Agents in a multi-agent system need to notify each other.  Agent A finishes work that Agent B needs to act on.  Agent A needs a review from the TestSpecialist.  An initiative moves to Now and the responsible project agent should wake up.

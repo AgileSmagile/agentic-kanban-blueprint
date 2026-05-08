@@ -52,15 +52,27 @@ If any of the terminology in this repo is unfamiliar, here's a quick reference:
 
 The board is the foundation. Everything else builds on it.
 
-**Which board tool?** The patterns in this repo are tool-agnostic, but the board *must* have an API for agents to interact with it automatically. Here are your options:
+**Which board tool?** The patterns in this repo are tool-agnostic at the basic level, but the board *must* have an API for agents to interact with it automatically.  What you can do depends on which tier of the blueprint you want.
+
+**Tier 1 — Single agent or human-coordinated multi-agent (any board with an API)**
 
 | Tool | API? | Free tier | Kanban features | Notes |
 |------|------|-----------|-----------------|-------|
 | [GitHub Projects](https://github.com) | Yes (GraphQL) | Yes | Basic | Good if your code is already on GitHub. Columns and cards, but no native WIP limits. |
 | [Trello](https://trello.com) | Yes (REST) | Yes (limited) | Basic | Easy to set up. API is straightforward. No native WIP limits. |
 | [Linear](https://linear.app) | Yes (GraphQL) | Yes (up to 250 issues) | Good | Clean API, good for software teams. Has workflow states. |
-| [Businessmap](https://businessmap.io/signup-partners?referral_code=smagile30referral) | Yes (REST) | [30-day trial](https://businessmap.io/signup-partners?referral_code=smagile30referral) ([request 90-day](<!-- TODO: n8n form URL -->)), then from ~£38/month (5 users) | Excellent | Native WIP limits at column, grouped column, swimlane, and user level.  Blocked-in-place semantics.  Multi-layer workflow (e.g. initiatives + cards).  This is what the production system uses. |
 | [Jira](https://www.atlassian.com/software/jira) | Yes (REST) | Yes (up to 10 users) | Good | Feature-rich but complex. If you already use it, it works. |
+| [Businessmap](https://businessmap.io/sign-up?referral_code=smagile30) | Yes (REST) | [30-day trial](https://businessmap.io/sign-up?referral_code=smagile30), then from ~£38/month (5 users) | Excellent | Native WIP limits, blocked-in-place semantics, multi-layer workflow.  This is what the production system uses. |
+
+**Tier 2 — Push-based agent-to-agent communication (enabled by Businessmap + n8n)**
+
+The inbox card pattern — where agents notify each other through the board with near-instant delivery — is made possible by **Businessmap's business rules engine** (which triggers on comment events and invokes an external webhook) combined with **n8n** (self-hosted, free) as the handler that fetches the comment body and creates the inbox card.
+
+This has been tested.  Trello, GitHub Projects, and Linear were evaluated and do not support comment-event triggers with external webhook invocation in the way needed.  Direct Businessmap webhooks without n8n also do not work, because Businessmap does not include the comment body in the webhook payload — you need the n8n API call to fetch it.
+
+Without Businessmap, agent-to-agent communication falls back to polling (see [agent-communication-workaround.md](agent-communication-workaround.md)), with latency measured in minutes rather than seconds.  For a single agent or a human-coordinated setup this is fine.  For a fully autonomous multi-agent estate, the push pattern is what makes it practical.
+
+A [30-day trial is available here](https://businessmap.io/sign-up?referral_code=smagile30), extended from the standard 14 days.  Request a 90-day trial if you want more runway to evaluate properly.
 
 **Start free.** You can always switch later. The operating model doesn't change; only the board CLI script needs adapting.
 
