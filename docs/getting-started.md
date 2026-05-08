@@ -72,7 +72,7 @@ This has been tested.  Trello, GitHub Projects, and Linear were evaluated and do
 
 Without Businessmap, agent-to-agent communication falls back to polling (see [agent-communication-workaround.md](agent-communication-workaround.md)), with latency measured in minutes rather than seconds.  For a single agent or a human-coordinated setup this is fine.  For a fully autonomous multi-agent estate, the push pattern is what makes it practical.
 
-A [30-day trial is available here](https://businessmap.io/sign-up?referral_code=smagile30), extended from the standard 14 days.  Request a 90-day trial if you want more runway to evaluate properly.
+A [30-day trial is available here](https://businessmap.io/sign-up?referral_code=smagile30), extended from the standard 14 days.  [Request a 90-day trial](https://n8n.smagile.co/form/akb-trial) if you want more runway to evaluate properly.
 
 **Start free.** You can always switch later. The operating model doesn't change; only the board CLI script needs adapting.
 
