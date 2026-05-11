@@ -31,7 +31,7 @@ Every tool below was chosen because it solved a real problem in the system.  Thi
 
 **Get started:** [claude.ai/code](https://claude.ai/code)
 
-**Free week of Claude Pro:** Max plan subscribers can share guest passes that give 7 days of full Claude Pro access, including Claude Code and the latest models.  If you know someone on the Max plan, ask them — each subscriber gets up to three passes, and once they are gone they do not replenish.  Watch for people sharing them on LinkedIn, Reddit (r/ClaudeAI), and Discord communities.  To activate, you will need a card on file; cancel before the 7-day window closes if you do not want to continue.
+**Free week of Claude Pro:** Max plan subscribers can share guest passes that give 7 days of full Claude Pro access, including Claude Code and the latest models.  If you know someone on the Max plan, ask them; each subscriber gets up to three passes, and once they are gone they do not replenish.  Watch for people sharing them on LinkedIn, Reddit (r/ClaudeAI), and Discord communities.  To activate, you will need a card on file; cancel before the 7-day window closes if you do not want to continue.
 
 ---
 
@@ -46,7 +46,7 @@ Every tool below was chosen because it solved a real problem in the system.  Thi
 
 **Pricing:** One plan, all features.  Starts at 5 users for ~£38/month (annual) or ~£46/month (monthly), scaling up in tiers.  Additional single seats can be added after the initial purchase.  Not the cheapest board option, but the API access and native Kanban semantics are what make autonomous agent interaction possible.  Evaluate whether your board tool of choice has an API before committing.
 
-**Educational use:** Businessmap offers a full individual licence at no cost for non-commercial educational purposes.  This is not a published programme — you need to reach out to the Businessmap team directly, explain your use case and situation, and request it.  [Contact Businessmap](https://businessmap.io/contact-sales?test-header) to ask.  If you hit any friction getting this set up, raise an issue in this repo and we will try to help.
+**Educational use:** Businessmap offers a full individual licence at no cost for non-commercial educational purposes.  This is not a published programme.  You need to reach out to the Businessmap team directly, explain your use case and situation, and request it.  [Contact Businessmap](https://businessmap.io/contact-sales?test-header) to ask.  If you hit any friction getting this set up, raise an issue in this repo and we will try to help.
 
 **Alternatives:** Any Kanban board with a REST API works.  The patterns in this repo are tool-agnostic; the CLI is Businessmap-specific but the structure is adaptable.  Trello, Jira, Linear, and GitHub Projects all have APIs, though their Kanban semantics vary.
 
@@ -63,7 +63,7 @@ Every tool below was chosen because it solved a real problem in the system.  Thi
 
 **Why this and not alternatives:** Self-hostable, so no per-execution pricing.  Visual workflow builder means automations are inspectable without reading code.  Webhook support makes it straightforward to wire into any API.  The agent can import and export workflow JSON programmatically.
 
-**Free tier:** Self-hosted is free (open source, fair-code licence — allows free use and self-hosting but restricts redistribution).  Cloud-hosted starts at ~£19/month.
+**Free tier:** Self-hosted is free (open source, fair-code licence, which allows free use and self-hosting but restricts redistribution).  Cloud-hosted starts at ~£19/month.
 
 **Get started:** [n8n.io](https://n8n.io)
 
