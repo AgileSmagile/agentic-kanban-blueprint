@@ -4,13 +4,13 @@
 
 | Component | Required? | Cost | Notes |
 |-----------|-----------|------|-------|
-| AI agent (Claude Code or similar) | **Yes** | ~£16-75/month | The engine that does the work.  Pro (~£16) for lighter use; Max (~£75) for heavy agentic workloads |
+| AI agent (Claude Code or similar) | **Yes** | Free for one week, then ~£75/month | The engine that does the work.  Max plan (~£75/month) is the practical minimum for sustained agentic work.  Pro (~£16/month) hits rate limits too quickly.  Start with the free trial week |
 | Kanban board with an API | **Yes** | £0-38/month | Free options work (Trello, GitHub Projects).  Paid tools have better Kanban features |
 | Workflow automation (n8n) | No, add later | £0 | Self-hosted, free.  Needed once you want push-based agent communication |
 | Cloudflare Workers | No, add later | £0 | Needed for the push-based agent communication pattern specifically |
 | Everything else below | No | £0 | Nice-to-haves with free tiers |
 
-**Minimum to start: ~£16/month** (AI subscription + free board tool).  Everything else is optional and can be added as your system grows.
+**Minimum to start: free for one week, then ~£75/month** (AI subscription + free board tool).  Everything else is optional and can be added as your system grows.
 
 ---
 
@@ -27,7 +27,7 @@ Every tool below was chosen because it solved a real problem in the system.  Thi
 
 **Why this and not alternatives:** Claude Code's tool-use model (bash, file read/write, search) maps directly to software engineering workflows.  The agent can read code, run tests, make commits, and interact with APIs without custom integration.  The conversation context carries the full operating model.
 
-**Pricing:** Claude Code is available with a Claude Pro subscription (~£16/month) or Max (~£75/month) for heavier usage.  No free tier.  Pro includes substantial usage; Max gives significantly higher daily limits, which matters for sustained agentic work.  Also available via API usage (pay-per-token).
+**Pricing:** The practical minimum for this system is the Max plan (~£75/month).  Pro (~£16/month) hits rate limits too quickly for sustained agentic workloads.  Also available via API usage (pay-per-token), which can be cost-effective for lighter or more controlled use.
 
 **Get started:** [claude.ai/code](https://claude.ai/code)
 
@@ -101,12 +101,12 @@ For a solo operator getting started:
 
 | Component | Monthly cost |
 |-----------|-------------|
-| Claude Code (Pro or Max) | £16-75 |
+| Claude Code (Max) | £75 |
 | Kanban board | £0-38 |
 | n8n (self-hosted) | £0 |
 | Cloudflare Workers | £0 |
 | GitHub (free tier) | £0 |
-| **Total** | **£16-113/month** |
+| **Total** | **£75-113/month** |
 
 The Kanban board is the main variable.  You can start with a free tool (Trello, GitHub Projects) and the patterns still apply.  The board CLI would need adapting, but the operating model doesn't change.
 
