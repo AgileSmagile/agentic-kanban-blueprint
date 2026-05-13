@@ -155,3 +155,4 @@ This takes 60 seconds and makes the next agent on a similar task measurably bett
 - **Too many domains.** Start with 2-3. Add when you genuinely have enough observations to seed rules.
 - **Hypotheses never get tested.** The before-ritual is the mechanism. If agents aren't scanning hypotheses before work, they're not testing them.
 - **Knowledge entries are too vague.** "Things went wrong" is not knowledge. "Deploy failed because cloudflared resolves localhost to IPv6 and the container only bound IPv4" is knowledge.
+- **Nobody reads across entries.** Knowledge accumulates but patterns go unnoticed because each agent only sees its own session. The [memory synthesis](memory-synthesis.md) pass addresses this: a periodic review that reads across daily logs, digests, and domain files to surface patterns, flag contradictions, and identify promotion candidates that individual sessions miss.
