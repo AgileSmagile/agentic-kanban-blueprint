@@ -1,0 +1,56 @@
+# Agentic Kanban Blueprint
+
+> A reference architecture for running AI agents with Kanban discipline.  Extracted from a production multi-agent delivery system.
+
+## What this is
+
+The Agentic Kanban Blueprint (AKB) documents an operating model for agentic AI systems grounded in flow thinking and Kanban principles.  It covers session continuity, knowledge management, agent personas, graduated autonomy, security hooks, and multi-agent coordination.
+
+This is not a framework to install.  It is a collection of patterns, policies, and working artefacts designed to be selectively lifted and adapted to your context.
+
+## Who it is for
+
+Independent builders, product owners, and practitioners running AI agents (Claude Code or similar) who want agents that:
+- Pick up where they left off between sessions without re-briefing
+- Operate within explicit flow constraints (WIP limits, age-based prioritisation)
+- Coordinate with other agents without a human in the middle
+- Compound learning across sessions via a structured knowledge system
+
+## Core concepts
+
+- **Board as memory:** the Kanban board is the primary source of truth for work state, not files or system prompts
+- **Session continuity:** startup and wrap-up rituals that preserve context across context resets
+- **Graduated autonomy:** five permission levels from approval-on-everything to full autonomous operation
+- **Knowledge system:** three-tier learning (observations, hypotheses, rules) that compounds across agents and sessions
+- **Agent personas:** soul vs instructions; identity that shapes judgment at the edges
+- **Mechanical enforcement:** hooks that enforce policies without relying on agents remembering them
+
+## Entry points
+
+- [README.md](README.md): conceptual overview for humans
+- [AGENT.md](AGENT.md): optimised entry point for AI agents exploring this repository
+- [docs/getting-started.md](docs/getting-started.md): step-by-step implementation guide
+- [docs/mistakes-we-made.md](docs/mistakes-we-made.md): production failure modes and structural fixes
+- [RELEASES.md](RELEASES.md): changelog and version history
+
+## Key documents
+
+- [docs/agent-communication.md](docs/agent-communication.md): inbox card pattern for async multi-agent coordination
+- [docs/graduated-autonomy.md](docs/graduated-autonomy.md): permission levels and prerequisite hooks
+- [docs/session-boundaries.md](docs/session-boundaries.md): startup and wrap-up routines
+- [docs/knowledge-system.md](docs/knowledge-system.md): three-tier learning architecture
+- [docs/security.md](docs/security.md): secret blocking hooks, compaction resilience, circuit-breaker patterns
+- [docs/writing-personas.md](docs/writing-personas.md): agent identity and character design
+- [orchestrator/agent-guidelines.md](orchestrator/agent-guidelines.md): the operating model agents read at session start
+
+## Stack
+
+- AI agent: Claude Code (Sonnet for project work, Opus for orchestration)
+- Kanban board: Businessmap (API-driven; any board with a REST API works for most patterns)
+- Workflow automation: n8n (push-based agent communication handler)
+- Edge functions: Cloudflare Workers (webhook bridge between board events and n8n)
+- Version control: GitHub
+
+## Series
+
+The AKB blog series at https://smagile.co/resources/blog/series/akb documents the thinking behind this architecture across 9 articles.

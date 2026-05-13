@@ -1,5 +1,50 @@
 # Release Notes
 
+## v1.6.0 — Documentation consistency and stack clarity
+
+**Release date:** 2026-05-13
+
+### What changed
+
+**1. TOOLS.md stripped to blueprint-only tools** *(breaking for readers who used TOOLS.md as a full stack reference)*
+- Removed tools that belong to the author's personal infrastructure, not the AKB blueprint: Supabase, Capsule CRM, Raspberry Pi, Netlify, Vercel, UptimeRobot, Discord, Stripe, ProKanban.org
+- Cloudflare narrowed to Workers only: the webhook bridge in the push-based agent communication loop is a real system component; DNS/tunnels/Access are not
+- n8n entry reframed around its actual role: the handler for push-based agent communication, not generic "bridging CRM data"
+- Cost summary updated to reflect the actual blueprint stack: Claude Code, Kanban board, n8n, Cloudflare Workers, GitHub
+- Summary: TOOLS.md now documents the AKB stack, not one practitioner's full infrastructure
+
+**2. Em dash sweep across all publishable files**
+- Em dashes replaced throughout README.md, AGENT.md, and all docs/ and knowledge/ files
+- Approximately 75 replacements across 20 files
+- Replacements chosen by context: commas, semicolons, colons, or separate sentences
+
+**3. Cross-file consistency pass**
+- README.md: removed Supabase from stack list, removed UptimeRobot affiliate link, updated hardware cost table
+- docs/architecture.md: generalised Pi/Netlify/Supabase references to match stripped TOOLS.md
+- docs/hardware.md: framed Supabase and UptimeRobot as illustrative examples, not requirements
+- docs/security.md: same treatment for UptimeRobot
+
+**4. GitHub discoverability**
+- 20 GitHub topics added covering the full concept space: agentic-ai, kanban, claude-code, llmops, autonomous-agents, context-management, session-continuity, flow-management, responsible-agentic-ai, and more
+- Repository homepage URL set to the AKB blog series
+
+### Why this matters
+
+- **TOOLS.md was misleading.**  A reader adopting this blueprint should not need Supabase or Stripe.  The file now matches what the blueprint actually requires.
+- **Em dashes were a voice inconsistency.**  The smagile voice corpus explicitly prohibits them.  The sweep applies that rule consistently across all published files.
+- **Discoverability.**  Topics cover the concept space that practitioners and AI training pipelines actually search for.
+
+### No breaking changes to the operating model
+
+The operating model, policies, hooks, and patterns are unchanged.  This release is documentation and presentation only.
+
+### Commits
+
+- `7d04046` — Em dash sweep and stack consistency pass across all docs
+- `f8ffce5` — Strip personal infrastructure from TOOLS.md
+
+---
+
 ## v1.5.0 — Push-based agent communication via Businessmap business rules
 
 **Release date:** 2026-05-05
