@@ -170,8 +170,9 @@ Then go deeper on the areas that interest you:
 4. **[Session boundaries](docs/session-boundaries.md)** -- how context survives when sessions end and new ones start
 5. **[Architecture overview](docs/architecture.md)** -- how the pieces fit together: multiple AI agents sharing a board, a knowledge system, and a secrets store
 6. **[Knowledge system](docs/knowledge-system.md)** -- how the three-tier learning system works in practice
-7. **[Writing agent personas](docs/writing-personas.md)** -- why personality matters, soul vs instructions, and how to write a character that shapes judgment
-8. **[Security model](docs/security.md)** -- how to run AI agents safely
+7. **[Memory synthesis](docs/memory-synthesis.md)** -- turning accumulated daily logs, digests, and domain knowledge into patterns and actionable insight
+8. **[Writing agent personas](docs/writing-personas.md)** -- why personality matters, soul vs instructions, and how to write a character that shapes judgment
+9. **[Security model](docs/security.md)** -- how to run AI agents safely
 
 ### Implement it (a few hours)
 

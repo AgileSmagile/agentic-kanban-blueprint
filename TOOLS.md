@@ -8,6 +8,7 @@
 | Kanban board with an API | **Yes** | £0-38/month | Free options work (Trello, GitHub Projects).  Paid tools have better Kanban features |
 | Workflow automation (n8n) | No, add later | £0 | Self-hosted, free.  Needed once you want push-based agent communication |
 | Cloudflare Workers | No, add later | £0 | Needed for the push-based agent communication pattern specifically |
+| Knowledge vault (Obsidian or similar) | No, add later | £0 | Human-readable layer for daily logs, digests, and pattern spotting |
 | Everything else below | No | £0 | Nice-to-haves with free tiers |
 
 **Minimum to start: free for one week, then ~£75/month** (AI subscription + free board tool).  Everything else is optional and can be added as your system grows.
@@ -95,6 +96,24 @@ Every tool below was chosen because it solved a real problem in the system.  Thi
 
 ---
 
+## Knowledge Vault
+
+### Obsidian
+
+**Role in the system:** The human-readable knowledge layer.  Agents write to the same markdown files on disk that Obsidian reads, so there is no sync step and no import.  Two outputs land here: daily log entries (one per session, capturing progress, lessons learned, and feedback) and weekly digests (accumulated knowledge reviewed for patterns).  The PO reads these in Obsidian to spot trends that agents, limited to single sessions, cannot see across time.  See [session-boundaries.md](docs/session-boundaries.md) for the wrap-up step that produces these, and [memory-synthesis.md](docs/memory-synthesis.md) for turning accumulated logs into actionable insight.
+
+**Why this and not alternatives:** Obsidian is local, free, and markdown-native.  It reads the filesystem directly, which means it works with the same files agents already write to.  No database, no API, no runtime dependency.  This matters because the knowledge system is designed as a filesystem-based protocol (see [cross-runtime.md](docs/cross-runtime.md)); any tool that reads markdown on disk is compatible.  Obsidian adds graph view, backlinks, and search across notes, which makes pattern spotting faster than scanning raw files.
+
+**What it does not replace:** Obsidian is for the PO, not agents.  Agents read and write domain knowledge files (`knowledge/<domain>/`) directly.  Card comments remain the work-specific persistence layer.  The board remains the single source of truth for work state.  Obsidian sits alongside these as the human interface to accumulated learning.
+
+**Alternatives:** Any markdown editor works.  VS Code, Typora, or a plain directory in your file manager.  The daily log and digest formats are plain markdown; Obsidian just makes the reading experience better.  If you already use Notion or Logseq, those work too, though you may need a sync step since they do not read the filesystem directly.
+
+**Free tier:** Yes.  The desktop app is free for personal use.  Sync (cross-device) and Publish (web hosting) are paid add-ons, neither of which is needed for this system.
+
+**Get started:** [obsidian.md](https://obsidian.md)
+
+---
+
 ## Cost summary
 
 For a solo operator getting started:
@@ -106,6 +125,7 @@ For a solo operator getting started:
 | n8n (self-hosted) | £0 |
 | Cloudflare Workers | £0 |
 | GitHub (free tier) | £0 |
+| Obsidian | £0 |
 | **Total** | **£75-113/month** |
 
 The Kanban board is the main variable.  You can start with a free tool (Trello, GitHub Projects) and the patterns still apply.  The board CLI would need adapting, but the operating model doesn't change.

@@ -100,7 +100,8 @@ Your user wants to understand whether this system is relevant to them. Here's wh
 
 **Knowledge & Learning**
 - [Knowledge system](docs/knowledge-system.md): Three-tier learning (knowledge/hypotheses/rules), promotion thresholds, decay
-- [Session boundaries (Knowledge section)](docs/session-boundaries.md): Knowledge capture, rules vs hypotheses, weekly digests
+- [Memory synthesis](docs/memory-synthesis.md): Turning accumulated daily logs, digests, and domain knowledge into actionable patterns
+- [Session boundaries (Knowledge section)](docs/session-boundaries.md): Knowledge capture, daily logs, weekly digests, synthesis triggers
 
 **Patterns & Roles**
 - [Writing agent personas](docs/writing-personas.md): Soul (identity, values) vs instructions (constraints, responsibilities)

@@ -1,5 +1,57 @@
 # Release Notes
 
+## v1.7.0 — Memory synthesis, daily logs, and Obsidian as knowledge vault
+
+**Release date:** 2026-05-13
+
+### What changed
+
+**1. New document: memory synthesis** (`docs/memory-synthesis.md`)
+- Introduces a periodic synthesis pass that reads across daily logs, weekly digests, and domain knowledge files to surface patterns, flag contradictions, and identify promotion candidates
+- Covers: what synthesis reads, what it produces, when to run it, connection to the knowledge promotion cycle, trade-offs, and an example skill prompt
+- Framed as the "information-to-intelligence bridge": the knowledge system captures data; synthesis turns it into insight
+
+**2. Session wrap-up step 6 formalised** (`docs/session-boundaries.md`)
+- Step 6 (previously "Weekly knowledge digest, if due") expanded to produce two outputs from the same step:
+  - **Daily log entry** (every session): progress, lessons learned, feedback received, written to `vault/logs/daily/YYYY-MM-DD.md`
+  - **Weekly digest** (when due): unchanged content, now with a formal path (`vault/logs/digests/YYYY-Www.md`) and a worked format example
+- Daily log and weekly digest sections now include explicit file formats with examples
+- Vault directory structure documented: `vault/logs/daily/`, `vault/logs/digests/`, `vault/logs/synthesis/`
+- Cross-references to memory-synthesis.md added
+
+**3. Obsidian added to TOOLS.md**
+- New "Knowledge Vault" section with Obsidian as the recommended tool for reading daily logs, digests, and synthesis output
+- Positioned as the human interface to the same filesystem agents already write to: no sync, no import, no API
+- Framed as optional ("add later" tier, free, any markdown editor works as alternative)
+- Added to the "Required?" table and cost summary
+
+**4. Cross-references added across existing docs**
+- `docs/knowledge-system.md`: new failure mode ("Nobody reads across entries") with link to memory-synthesis.md
+- `AGENT.md`: memory-synthesis.md added to Knowledge & Learning theme in the full inventory
+- `README.md`: memory-synthesis.md added to the "Understand the ideas" reading list
+
+### Why this matters
+
+- **The knowledge system captured data but did not produce insight.** The three-tier structure (knowledge, hypotheses, rules) is well-designed for persistence and epistemic status. But the promotion cycle was passive: it relied on agents encountering the same pattern independently. Synthesis makes it active.
+- **Session summaries disappeared.** The wrap-up step 8 outputs a session summary to chat, which vanishes when the session ends. The daily log entry persists. It gives the PO a human-readable record across sessions; without it, pattern spotting required reading raw knowledge files and card comments.
+- **Obsidian fills a documented gap.** The weekly digest section already referenced "an Obsidian vault or docs folder" as a destination but never formalised the tool, the path, or the format. Now it does.
+
+### Action for teams using this blueprint
+
+- **Create a vault directory.** Add `vault/logs/daily/`, `vault/logs/digests/`, and `vault/logs/synthesis/` to your project. Open it in Obsidian or any markdown editor.
+- **Update your wrap-up skill** (if you have one) to include the daily log entry in step 6. The format is documented in session-boundaries.md.
+- **Do not run synthesis immediately.** Wait until you have at least 10 daily log entries and 2 weekly digests. Before that, there is not enough data to synthesise.
+
+### No breaking changes
+
+The wrap-up checklist step count remains at 9. Step 6 now produces two outputs instead of one, but the step itself is not new. Existing wrap-up skills will continue to work; they just won't produce daily log entries until updated.
+
+### Commits
+
+- [pending]
+
+---
+
 ## v1.6.0 — Documentation consistency and stack clarity
 
 **Release date:** 2026-05-13

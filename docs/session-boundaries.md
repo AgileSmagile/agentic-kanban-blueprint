@@ -255,7 +255,18 @@ The PO types a command (in Claude Code, this is a custom skill invoked via slash
 
 5. **Environment parity check (if applicable).** If your project has pre-prod and production deployments with different automation rules, check for divergence. If pre-prod auto-deploys on every push to main but production requires manual dispatch, list commits waiting for promotion. Flag if non-breaking changes are aging in a vetting column. This prevents pre-prod and prod from silently drifting out of sync.
 
-6. **Weekly knowledge digest (if due).** Check whether 7 or more days have passed since the last digest. If so, compile a review of: knowledge added, hypotheses pending, rules promoted or demoted, memory changes, and stale candidates for pruning. If not due, skip.
+6. **Daily log and weekly digest.** This step produces two outputs to the same destination: a knowledge vault directory (e.g. an [Obsidian](https://obsidian.md) vault or any markdown-on-disk folder).
+
+   **Daily log entry (every session).** Write a short entry to `vault/logs/daily/YYYY-MM-DD.md` capturing three things:
+   - **Progress**: what shipped, what moved, what's closer to done. A narrative, not a diff.
+   - **Lessons learned**: what the agent or PO learned this session that isn't card-specific. This overlaps with the knowledge system (step 3) but is formatted for human reading, not domain file syntax.
+   - **Feedback received**: corrections from the PO, approaches validated, things that worked well. The PO's voice captured for future reference.
+
+   If multiple sessions happen on the same day, append to the existing file. Each entry gets a timestamp header. The daily log is the human-readable record; the PO reads it in Obsidian to spot patterns across days and weeks that agents, limited to single sessions, cannot see. See [memory-synthesis.md](memory-synthesis.md) for how these logs feed a periodic synthesis pass.
+
+   **Weekly digest (when due).** Check whether 7 or more days have passed since the last digest. If so, write a digest to `vault/logs/digests/YYYY-Www.md` covering: knowledge added, hypotheses pending, rules promoted or demoted, memory changes, and stale candidates for pruning. If not due, skip. The digest format is detailed in the [weekly knowledge digest](#the-weekly-knowledge-digest) section below.
+
+   "Nothing to log" is a valid outcome for the daily entry if the session was purely exploratory with no progress, lessons, or feedback. But this should be rare; most sessions produce at least one of the three.
 
 7. **PO feedback.** The product owner is part of the system. Give them honest feedback on how they contributed to system performance this session, both positive and negative. Highlight what is working so they know what to keep doing. Do not shy away from what needs to improve.
 
@@ -294,7 +305,7 @@ The skill is invoked by typing `/lets-wrap` in the Claude Code prompt. The skill
 3. **Knowledge system.** Did the session produce observations a fresh agent on a different card would benefit from? Write to the relevant domain files if yes.
 4. **Memory update.** Memory IS the handoff. Update if anything about user preferences, project decisions, or cross-project insights changed.
 5. **Environment parity check (if applicable).** Pre-prod/prod divergence. Flag non-breaking changes aging in vetting.
-6. **Weekly knowledge digest (if due).** 7+ days since last digest? Compile one. If not due, skip.
+6. **Daily log and weekly digest.** Write daily log entry to `vault/logs/daily/YYYY-MM-DD.md` (progress, lessons, feedback). If 7+ days since last digest, also write digest to `vault/logs/digests/YYYY-Www.md`.
 7. **PO feedback.** Did the PO's actions or inactions contribute to system underperformance? Process gaps, bottlenecks, pattern hypocrisy, fragmentation. Direct, unapologetic, data not criticism.
 8. **Session summary.** Done this session; what could have gone better.
 9. **Confirmation.** All nine steps listed; each acted on or explicitly skipped with a reason.
@@ -307,19 +318,71 @@ Knowledge, hypotheses, and memory entries accumulate across sessions. Without pe
 
 The obvious fix is a scheduled job. The problem: if the system runs on a local machine, any scheduled job silently fails when the machine is off. No retry, no catch-up.
 
-The better fix is event-driven. The wrap-up checklist already runs at session end, when the machine is guaranteed to be on. Add a step that checks whether seven days have passed since the last digest. If so, compile one. If not, skip.
+The better fix is event-driven. The wrap-up checklist already runs at session end, when the machine is guaranteed to be on. Step 6 checks whether seven days have passed since the last digest. If so, the agent compiles one alongside the daily log entry. If not, it writes only the daily log and moves on.
 
 Zero infrastructure. No cron job. No new failure mode. The digest piggybacks on a moment where the PO is already in reflection mode.
 
-### What the digest covers
+### Where it goes
 
-- **Knowledge added** across all project repos since the last digest
-- **Hypotheses pending**: unresolved hypotheses across domains
-- **Rules promoted or demoted**: changes to the rule base
-- **Memory changes**: what was added or updated in agent memory
-- **Stale candidates**: anything that looks outdated or contradictory, flagged for the PO to prune
+Both daily logs and weekly digests land in the same vault directory. The recommended structure:
 
-The digest is written to a dedicated reviews directory (e.g. in an Obsidian vault or docs folder), one file per week. The PO reads it, prunes what is outdated, promotes what has earned it. Fifteen minutes, once a week, closing the loop on accumulated intelligence.
+```
+vault/
+  logs/
+    daily/
+      2026-05-12.md
+      2026-05-13.md
+    digests/
+      2026-W20.md
+      2026-W21.md
+```
+
+This can be an [Obsidian](https://obsidian.md) vault, a plain directory, or any markdown-on-disk tool (see [TOOLS.md](../TOOLS.md) for options). The point is: agents write markdown files; the PO reads them in whatever tool they prefer.
+
+### Daily log format
+
+Each session appends an entry. Multiple sessions on the same day stack under timestamp headers.
+
+```markdown
+## 14:30 — mosaic, card #42
+
+**Progress:** Implemented rate limiting on /api/generate. PR #87 opened. Tests passing.
+
+**Lessons:** The Supabase rate-limit store from card #699 needs a TTL on cached counts; without it, limits reset only on restart. Added to knowledge/your-product/knowledge.md.
+
+**Feedback:** PO confirmed that per-user limits (not per-IP) is the right model. Free tier 10/hour, pro 50/hour.
+```
+
+Keep entries short. Three to five sentences per section is enough. The daily log is for scanning, not for comprehensive reporting; the card comment is where the detailed handoff lives.
+
+### Weekly digest format
+
+The digest covers all projects, not just the one the agent worked on this session.
+
+```markdown
+# Weekly Digest — 2026-W20
+
+## Knowledge added
+- [your-product] Rate limiting: per-user model confirmed, TTL needed on cached counts
+- [infrastructure] Blue-green deploy: health check must include DB connectivity, not just HTTP 200
+
+## Hypotheses pending
+- H3: Coverage above 80% correlates with fewer rework cycles (3/5 confirmations)
+- H7: Cards with acceptance criteria ship 2x faster (1/5 confirmations)
+
+## Rules promoted / demoted
+- Promoted: "Block PR merge if any test file was deleted without replacement" (was H2, 6 confirmations)
+- None demoted
+
+## Memory changes
+- Updated project memory: Supabase rate-limit store requires TTL configuration
+- Added feedback memory: PO prefers per-user over per-IP rate limiting
+
+## Stale candidates
+- knowledge/infrastructure/knowledge.md entry from 2026-03-15 references a deploy script path that no longer exists. Verify or remove.
+```
+
+The PO reads this in 15 minutes, prunes what is outdated, promotes what has earned it. This is the closing of the loop on accumulated intelligence. For turning accumulated digests into deeper pattern analysis, see [memory-synthesis.md](memory-synthesis.md).
 
 ### Why event-driven beats time-driven
 
