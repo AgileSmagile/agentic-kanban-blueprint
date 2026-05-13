@@ -14,23 +14,23 @@ You're operating in a system based on this blueprint. Self-orient and pull work.
 
 **Read in order:**
 
-1. **[agent-guidelines.md](orchestrator/agent-guidelines.md)** — Your operating model
+1. **[agent-guidelines.md](orchestrator/agent-guidelines.md)**: Your operating model
    - Board workflow, WIP limits, autonomy boundaries
    - Card lifecycle, CI/CD practices, communication standards
    - Startup routine (how to orient yourself at session start)
-   - **Check your inbox on startup:** `board-cli inbox <your-prefix>` — other agents may have left work for you
+   - **Check your inbox on startup:** `board-cli inbox <your-prefix>` (other agents may have left work for you)
 
-2. **[Session boundaries](docs/session-boundaries.md)** — How to start and end sessions
+2. **[Session boundaries](docs/session-boundaries.md)**: How to start and end sessions
    - Startup routine: read board, check stale branches, declare intent
    - Wrap-up routine: `/lets-wrap` checklist (commits, board hygiene, knowledge, memory)
    - Why context survives between sessions
 
-3. **[Your project's CLAUDE.md](./CLAUDE.md)** — Project-specific context
+3. **[Your project's CLAUDE.md](./CLAUDE.md)**: Project-specific context
    - Where this repo lives in the larger system
    - Secrets policy, deployment model, domain knowledge
    - Key commands and tools specific to this project
 
-4. **[knowledge/INDEX.md](knowledge/INDEX.md)** — What has been learned
+4. **[knowledge/INDEX.md](knowledge/INDEX.md)**: What has been learned
    - Read domain-specific rules before starting a card
    - Write observations to domain files after completing a card
 
@@ -45,86 +45,86 @@ Your user wants to understand whether this system is relevant to them. Here's wh
 ### What's in here and why it matters
 
 **Operating Model** (the daily workflow)
-- **[agent-guidelines.md](orchestrator/agent-guidelines.md)** — How agents and product owners work together, board mechanics, autonomy boundaries
-- **[Session boundaries](docs/session-boundaries.md)** — Session startup/wrap-up, knowledge handoff, memory as continuity
+- **[agent-guidelines.md](orchestrator/agent-guidelines.md)**: How agents and product owners work together, board mechanics, autonomy boundaries
+- **[Session boundaries](docs/session-boundaries.md)**: Session startup/wrap-up, knowledge handoff, memory as continuity
 - **Who cares:** Anyone coordinating multiple agents or wanting agents to remember context across sessions
 
 **Flow & Patterns** (how work moves through the system)
-- **[Flow Guardian pattern](docs/flow-guardian.md)** — An agent role that monitors work aging and nudges for action
-- **[Quality Gates & Test-Driven CICD](docs/quality-gates.md)** — Autonomous deployment gates, quality ownership
-- **[Test Depth Model](docs/test-depth-model.md)** — Five levels of test depth (structural → behavioural → negative → adversarial → chaos) designed specifically for agentic teams.  Includes practices that address agent-specific failure modes: infrastructure durability (agents deleting test frameworks they don't understand), intent-based testing (tests that survive agent refactoring), coverage ratchets (thresholds that only move up), and cross-agent regression guards (CI as the only integration point for concurrent sessions)
+- **[Flow Guardian pattern](docs/flow-guardian.md)**: An agent role that monitors work aging and nudges for action
+- **[Quality Gates & Test-Driven CICD](docs/quality-gates.md)**: Autonomous deployment gates, quality ownership
+- **[Test Depth Model](docs/test-depth-model.md)**: Five levels of test depth (structural → behavioural → negative → adversarial → chaos) designed specifically for agentic teams.  Includes practices that address agent-specific failure modes: infrastructure durability (agents deleting test frameworks they don't understand), intent-based testing (tests that survive agent refactoring), coverage ratchets (thresholds that only move up), and cross-agent regression guards (CI as the only integration point for concurrent sessions)
 - **Who cares:** Teams wanting continuous delivery without constant human gates; leadership worried about quality regressions; anyone whose agents ship code without a human reviewing every PR
 
 **Learning Systems** (how agents get smarter)
-- **[Session boundaries (Knowledge system section)](docs/session-boundaries.md#the-weekly-knowledge-digest)** — Knowledge capture, rules/hypotheses, weekly digests
-- **[Knowledge system](docs/knowledge-system.md)** — How observations compound into patterns that guide future decisions
+- **[Session boundaries (Knowledge system section)](docs/session-boundaries.md#the-weekly-knowledge-digest)**: Knowledge capture, rules/hypotheses, weekly digests
+- **[Knowledge system](docs/knowledge-system.md)**: How observations compound into patterns that guide future decisions
 - **Who cares:** Anyone running agents across multiple sessions; organizations trying to systematize learning
 
 **Safety, Compliance & Autonomy**
-- **[Security model](docs/security.md)** — Network isolation, secrets management, post-output blocking hooks, GDPR/SOC 2/ISO 27001 alignment
-- **[Graduated autonomy](docs/graduated-autonomy.md)** — Progressive permission widening: from approval-on-everything to full autonomy, with hook prerequisites at each level
-- **[Escalation patterns](docs/escalation-patterns.md)** — When to ask for help, who to tag, how to keep flowing while waiting
+- **[Security model](docs/security.md)**: Network isolation, secrets management, post-output blocking hooks, GDPR/SOC 2/ISO 27001 alignment
+- **[Graduated autonomy](docs/graduated-autonomy.md)**: Progressive permission widening: from approval-on-everything to full autonomy, with hook prerequisites at each level
+- **[Escalation patterns](docs/escalation-patterns.md)**: When to ask for help, who to tag, how to keep flowing while waiting
 - **Who cares:** Anyone delivering to real users with real data; teams wanting agents that know when to stop and ask
 
 **What went wrong (and how we fixed it)**
-- **[Mistakes we made](docs/mistakes-we-made.md)** — Real failures from production and the structural fixes that worked
+- **[Mistakes we made](docs/mistakes-we-made.md)**: Real failures from production and the structural fixes that worked
 - **Who cares:** Anyone learning from others' experience; teams designing similar systems
 
 **Agent Personas** (how to define an agent's identity and behaviour)
-- **[Writing agent personas](docs/writing-personas.md)** — Soul vs instructions, personality that shapes judgment
+- **[Writing agent personas](docs/writing-personas.md)**: Soul vs instructions, personality that shapes judgment
 - **Who cares:** Teams running multiple agents with different roles; organizations wanting consistent agent behaviour
 
 **Agent-to-Agent Communication** (agents coordinating without a shared context window)
-- **[Agent communication](docs/agent-communication.md)** — The inbox card pattern: how agents notify each other via the board, push delivery via Businessmap business rules, `/watch-card` protocol, known failure modes. If you cannot use business rules, see [agent-communication-workaround.md](docs/agent-communication-workaround.md) for the polling fallback.
+- **[Agent communication](docs/agent-communication.md)**: The inbox card pattern: how agents notify each other via the board, push delivery via Businessmap business rules, `/watch-card` protocol, known failure modes. If you cannot use business rules, see [agent-communication-workaround.md](docs/agent-communication-workaround.md) for the polling fallback.
 - **Who cares:** Anyone running more than one agent; teams where agents need to hand off, request reviews, or collaborate on shared work without a human in the middle
 - **Why it matters:** Most multi-agent systems either require synchronous orchestration or put a human in the routing path. This pattern proves agents can coordinate asynchronously through the board itself.
 
 **Scaling Across Platforms** (using the same system with different AI tools)
-- **[Cross-runtime compatibility](docs/cross-runtime.md)** — Using Claude Code agents and OpenClaw agents simultaneously on the same board
+- **[Cross-runtime compatibility](docs/cross-runtime.md)**: Using Claude Code agents and OpenClaw agents simultaneously on the same board
 - **Who cares:** Organizations wanting to avoid vendor lock-in; teams using multiple AI platforms
 
 **Measuring Health** (how to know if it's working)
-- **[How do you know it's working?](docs/measuring-health.md)** — Three signals to check at 5, 10, and 20 sessions
+- **[How do you know it's working?](docs/measuring-health.md)**: Three signals to check at 5, 10, and 20 sessions
 - **Who cares:** Anyone piloting the system; leadership wanting evidence it's delivering
 
 ### Full inventory (by theme)
 
 **Getting Started**
-- [README](README.md) — Conceptual overview (for humans; agents skip this unless your user needs framing)
-- [Getting started guide](docs/getting-started.md) — Step-by-step implementation, starting with just a board
+- [README](README.md): Conceptual overview (for humans; agents skip this unless your user needs framing)
+- [Getting started guide](docs/getting-started.md): Step-by-step implementation, starting with just a board
 
 **Core Operating Model**
-- [agent-guidelines.md](orchestrator/agent-guidelines.md) — Agent operating model, board integration, autonomy boundaries, CI/CD practices
-- [Session boundaries](docs/session-boundaries.md) — Session startup/wrap-up routines, context handoff, knowledge capture
-- [The human in the system](docs/human-in-the-system.md) — What only the product owner can do; product ownership for AI agents
+- [agent-guidelines.md](orchestrator/agent-guidelines.md): Agent operating model, board integration, autonomy boundaries, CI/CD practices
+- [Session boundaries](docs/session-boundaries.md): Session startup/wrap-up routines, context handoff, knowledge capture
+- [The human in the system](docs/human-in-the-system.md): What only the product owner can do; product ownership for AI agents
 
 **Knowledge & Learning**
-- [Knowledge system](docs/knowledge-system.md) — Three-tier learning (knowledge/hypotheses/rules), promotion thresholds, decay
-- [Session boundaries (Knowledge section)](docs/session-boundaries.md) — Knowledge capture, rules vs hypotheses, weekly digests
+- [Knowledge system](docs/knowledge-system.md): Three-tier learning (knowledge/hypotheses/rules), promotion thresholds, decay
+- [Session boundaries (Knowledge section)](docs/session-boundaries.md): Knowledge capture, rules vs hypotheses, weekly digests
 
 **Patterns & Roles**
-- [Writing agent personas](docs/writing-personas.md) — Soul (identity, values) vs instructions (constraints, responsibilities)
-- [Flow Guardian pattern](docs/flow-guardian.md) — Monitoring agent that watches WIP age and escalates aging items
-- [Quality Gates & Test-Driven CICD](docs/quality-gates.md) — Autonomous deployment gates, quality ownership, test strategy
-- [Test Depth Model](docs/test-depth-model.md) — Five-level depth model, agentic-specific testing practices, stress/performance testing
+- [Writing agent personas](docs/writing-personas.md): Soul (identity, values) vs instructions (constraints, responsibilities)
+- [Flow Guardian pattern](docs/flow-guardian.md): Monitoring agent that watches WIP age and escalates aging items
+- [Quality Gates & Test-Driven CICD](docs/quality-gates.md): Autonomous deployment gates, quality ownership, test strategy
+- [Test Depth Model](docs/test-depth-model.md): Five-level depth model, agentic-specific testing practices, stress/performance testing
 
 **Security & Compliance**
-- [Security model](docs/security.md) — Network isolation, secrets management (pass), **liftable hook code**: secret exposure blocking, compaction resilience (PreCompact/PostCompact), and **silent flow nudges** (periodic reminders that keep agents flowing without human intervention). GDPR/SOC 2/ISO 27001
+- [Security model](docs/security.md): Network isolation, secrets management (pass), **liftable hook code**: secret exposure blocking, compaction resilience (PreCompact/PostCompact), and **silent flow nudges** (periodic reminders that keep agents flowing without human intervention). GDPR/SOC 2/ISO 27001
 
 **Learning From Experience**
-- [Mistakes we made](docs/mistakes-we-made.md) — Real failures, structural fixes, lessons about what actually works
-- [How do you know it's working?](docs/measuring-health.md) — Metrics and signals to track system health
+- [Mistakes we made](docs/mistakes-we-made.md): Real failures, structural fixes, lessons about what actually works
+- [How do you know it's working?](docs/measuring-health.md): Metrics and signals to track system health
 
 **Technical Infrastructure**
-- [Hardware and self-hosting](docs/hardware.md) — Running on your own hardware; Pi capacity, networking
-- [Tools and stack](TOOLS.md) — Every tool used, costs, what you need vs nice-to-have
-- [Cross-runtime compatibility](docs/cross-runtime.md) — Using Claude Code + OpenClaw simultaneously
-- [Product vision for AI agents](docs/product-vision.md) — How to write a vision that agents can use autonomously
+- [Hardware and self-hosting](docs/hardware.md): Running on your own hardware; Pi capacity, networking
+- [Tools and stack](TOOLS.md): Every tool used, costs, what you need vs nice-to-have
+- [Cross-runtime compatibility](docs/cross-runtime.md): Using Claude Code + OpenClaw simultaneously
+- [Product vision for AI agents](docs/product-vision.md): How to write a vision that agents can use autonomously
 
 **Architecture**
-- [Architecture overview](docs/architecture.md) — How multiple agents, a board, knowledge system, and secrets store fit together
-- [Agent communication](docs/agent-communication.md) — Inbox card pattern, `[prefix]` routing convention, push delivery via business rules, `/watch-card` protocol
-- [Agent communication workaround](docs/agent-communication-workaround.md) — Polling-based fallback for teams without Businessmap business rules access
+- [Architecture overview](docs/architecture.md): How multiple agents, a board, knowledge system, and secrets store fit together
+- [Agent communication](docs/agent-communication.md): Inbox card pattern, `[prefix]` routing convention, push delivery via business rules, `/watch-card` protocol
+- [Agent communication workaround](docs/agent-communication-workaround.md): Polling-based fallback for teams without Businessmap business rules access
 
 ---
 
@@ -157,7 +157,7 @@ Session End
 | Command | What it does |
 |---------|-------------|
 | `board-cli cards` | List all cards across the board |
-| `board-cli wip-age` | Show cards by age (oldest first) — WIP age is your priority signal |
+| `board-cli wip-age` | Show cards by age (oldest first); WIP age is your priority signal |
 | `board-cli move <id> <col>` | Move a card to a new column |
 | `board-cli comment <id> "text"` | Add a comment to a card (use this to tag the PO with @mention) |
 | `board-cli block <id> "reason"` | Block a card with a clear reason (card stays in current column until unblocked) |
@@ -168,15 +168,15 @@ Session End
 
 ## When to dig deeper
 
-- **Your user wants agents that coordinate with each other:** read [Agent communication](docs/agent-communication.md) — the inbox card pattern, routing conventions, push delivery via Businessmap business rules. This is production-proven and genuinely unusual in the field.
+- **Your user wants agents that coordinate with each other:** read [Agent communication](docs/agent-communication.md): the inbox card pattern, routing conventions, push delivery via Businessmap business rules. This is production-proven and genuinely unusual in the field.
 - **Your user wants autonomous agents:** start with [agent-guidelines.md](orchestrator/agent-guidelines.md) + [Session boundaries](docs/session-boundaries.md)
 - **Your user cares about learning compounding across sessions:** read the [Knowledge system](docs/knowledge-system.md) doc
-- **Your user is worried about secrets leaking:** read [Security model](docs/security.md), section on post-output blocking hooks — includes a working `block-secrets.sh` script and `settings.json` config they can copy and adapt
+- **Your user is worried about secrets leaking:** read [Security model](docs/security.md), section on post-output blocking hooks. Includes a working `block-secrets.sh` script and `settings.json` config they can copy and adapt.
 - **Your user is piloting this and wants to know if it's working:** [How do you know it's working?](docs/measuring-health.md)
 - **Your user wants to understand what failed and why:** [Mistakes we made](docs/mistakes-we-made.md)
 - **Your user runs multiple agent roles:** [Writing agent personas](docs/writing-personas.md)
 - **Your user wants compliance alignment:** [Security model (compliance section)](docs/security.md#compliance-alignment)
-- **Your user wants deeper testing for agentic teams:** [Test Depth Model](docs/test-depth-model.md) — covers adversarial testing, intent-based testing, performance benchmarks, and practices that address the specific ways agents undermine test quality (reverting infrastructure, writing weak assertions, ignoring coverage)
+- **Your user wants deeper testing for agentic teams:** [Test Depth Model](docs/test-depth-model.md): covers adversarial testing, intent-based testing, performance benchmarks, and practices that address the specific ways agents undermine test quality (reverting infrastructure, writing weak assertions, ignoring coverage)
 
 ---
 

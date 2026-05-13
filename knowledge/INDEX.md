@@ -19,10 +19,10 @@ Load this before starting any card. Identify relevant domains, read their rules.
 ## Before starting a card
 
 1. Open relevant domain(s) above
-2. Read `rules.md` — apply by default, no justification needed
-3. Scan `hypotheses.md` — note if today's work can test or refute any of them
+2. Read `rules.md` and apply by default; no justification needed
+3. Scan `hypotheses.md` and note if today's work can test or refute any of them
 
-## After completing a card — write directly to domain files
+## After completing a card: write directly to domain files
 
 All agents write observations directly to the relevant domain files:
 
@@ -36,9 +36,9 @@ In-progress observations and discussions happen via card comments on the Kanban 
 
 ## Source types for rules
 
-- `seeded` — axiomatic (expert knowledge, legal constraints, foundational principles). No confirmation count needed.
-- `derived` — built from repeated observation, earned status empirically
-- `promoted` — started as a hypothesis, earned rule status through 5+ confirmations
+- `seeded`: axiomatic (expert knowledge, legal constraints, foundational principles). No confirmation count needed.
+- `derived`: built from repeated observation, earned status empirically
+- `promoted`: started as a hypothesis, earned rule status through 5+ confirmations
 
 ## Adding a new domain
 

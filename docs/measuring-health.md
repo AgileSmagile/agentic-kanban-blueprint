@@ -75,7 +75,7 @@ If you're mostly making decisions and reviewing output, the system is working as
 
 The signals above are deliberately practical rather than metric-heavy.  That is intentional.
 
-In a solo agentic system, the bottleneck does not move.  It is the human — the product owner — every time.  The standard Kanban response to that (inspect your cumulative flow diagram, identify where work is piling up, swarm the constraint) does not apply in the same way when there is one human and the constraint is structural.
+In a solo agentic system, the bottleneck does not move.  It is the human, the product owner, every time.  The standard Kanban response to that (inspect your cumulative flow diagram, identify where work is piling up, swarm the constraint) does not apply in the same way when there is one human and the constraint is structural.
 
 The interventions that actually reduce the bottleneck in this system are architectural: YOLO mode to remove routine permission prompts, fix-forward policy so work does not halt, robust test coverage so confidence in automation is warranted, mechanical hooks that enforce rules without relying on the agent remembering them.  These are flow interventions.  They just do not show up on a chart.
 
@@ -83,4 +83,4 @@ Where flow management does matter at a higher level of fidelity is at the initia
 
 If you have a team, or longer-cycle work with genuine handoff points between people, card-level flow metrics will tell you things worth knowing.  The signals in this document are designed for a solo operator.  Adapt accordingly.
 
-For a fuller treatment of this: [The Bottleneck Is Me](https://smagile.co/resources/blog/) — Part 9 of the Agentic Kanban Blueprint series.
+For a fuller treatment of this: [The Bottleneck Is Me](https://smagile.co/resources/blog/), Part 9 of the Agentic Kanban Blueprint series.

@@ -14,9 +14,9 @@ Tests are not just quality assurance. Tests are what enable CICD to promote code
 
 **Every card that touches code must produce three categories of tests:**
 
-1. **Unit tests** — test the new behaviour in isolation. Test the specific function, method, or component changed. Fast, deterministic, no external dependencies.
-2. **Regression tests** — confirm that adjacent functionality has not broken. Run against existing test fixtures. If a regression test doesn't exist for something this change could affect, write it.
-3. **Smoke tests** — validate the user-facing path end-to-end. Not exhaustive, but enough to confirm the happy path works in a deployed environment.
+1. **Unit tests**: test the new behaviour in isolation. Test the specific function, method, or component changed. Fast, deterministic, no external dependencies.
+2. **Regression tests**: confirm that adjacent functionality has not broken. Run against existing test fixtures. If a regression test doesn't exist for something this change could affect, write it.
+3. **Smoke tests**: validate the user-facing path end-to-end. Not exhaustive, but enough to confirm the happy path works in a deployed environment.
 
 Tests are written **as part of the card work**, not in a follow-up. Tests come before or alongside the implementation, not after.
 
@@ -61,7 +61,7 @@ See [personas/quality-guardian/](../personas/quality-guardian/) for the full rol
 
 ## Defining Non-Negotiable Concerns
 
-The Quality Guardian's authority comes from **non-negotiable concerns** — things that, if broken, carry unacceptable consequences for your context.
+The Quality Guardian's authority comes from **non-negotiable concerns**: things that, if broken, carry unacceptable consequences for your context.
 
 Examples vary by system:
 
@@ -173,7 +173,7 @@ See `knowledge/quality-engineering/rules.md` for the full rule set. See `knowled
 
 ## References
 
-- [test-depth-model.md](test-depth-model.md) — Five-level test depth model and agentic-specific testing practices
-- [personas/quality-guardian/](../personas/quality-guardian/) — Full role definition (soul & instructions)
-- [architecture.md](architecture.md) — How agents fit into the overall system
-- [human-in-the-system.md](human-in-the-system.md) — When humans intervene and why
+- [test-depth-model.md](test-depth-model.md): Five-level test depth model and agentic-specific testing practices
+- [personas/quality-guardian/](../personas/quality-guardian/): Full role definition (soul & instructions)
+- [architecture.md](architecture.md): How agents fit into the overall system
+- [human-in-the-system.md](human-in-the-system.md): When humans intervene and why

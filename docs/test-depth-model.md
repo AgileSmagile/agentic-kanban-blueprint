@@ -184,6 +184,6 @@ When your Quality Guardian discovers a new pattern (e.g. "agents revert undocume
 
 ## References
 
-- [quality-gates.md](quality-gates.md) — CICD pipeline and Quality Guardian role
-- [security.md](security.md) — Security principles and compliance
-- [knowledge/quality-engineering/](../knowledge/quality-engineering/) — Observed patterns and rules
+- [quality-gates.md](quality-gates.md): CICD pipeline and Quality Guardian role
+- [security.md](security.md): Security principles and compliance
+- [knowledge/quality-engineering/](../knowledge/quality-engineering/): Observed patterns and rules

@@ -11,4 +11,4 @@ Observed patterns from running this system. Raw material for future hypothesis a
 ## Agentic Kanban experiment learnings
 
 - WIP visibility translates well to LLM context: a structured board state (columns, ages, blockers) is something agents can reason about accurately.
-- The "no blocked column" policy requires agents to understand blocking semantics. This needs to be explicit in instructions — agents default to wanting to move blocked cards somewhere.
+- The "no blocked column" policy requires agents to understand blocking semantics. This needs to be explicit in instructions; agents default to wanting to move blocked cards somewhere.

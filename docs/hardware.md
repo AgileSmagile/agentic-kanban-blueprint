@@ -97,7 +97,7 @@ Internet
    │        └── Cannot reach guest network
 ```
 
-1. **Put the Pi on a guest network or isolated VLAN (virtual LAN — a way to create separate network segments on the same physical network).** Most home routers support guest WiFi. The Pi sits on this segment, isolated from your primary network. If the Pi is compromised, the attacker can't reach your laptop, NAS, or other devices.
+1. **Put the Pi on a guest network or isolated VLAN (virtual LAN: a way to create separate network segments on the same physical network).** Most home routers support guest WiFi. The Pi sits on this segment, isolated from your primary network. If the Pi is compromised, the attacker can't reach your laptop, NAS, or other devices.
 
 2. **Disable the Pi's WiFi access point.** The onboard WiFi can create a bridge between network segments if left enabled. Disable it.
 
@@ -143,10 +143,10 @@ For a typical small SaaS (web app + database + auth + automation + AI agent):
 | Component | Self-hosted | Cloud equivalent |
 |-----------|------------|-----------------|
 | Compute (app, agent, automation) | ~£160 one-time (Pi hardware) | £16-48/month (Vercel Pro + Railway/Fly.io) |
-| Database + Auth | £0 (Supabase free tier) | £0 (Supabase free tier) |
+| Database + Auth | £0 (managed free tier, e.g. Supabase) | £0 (managed free tier) |
 | DNS + Tunnels + CDN | £0 (Cloudflare free tier) | £0 (Cloudflare free tier) |
 | CI/CD | £0 (GitHub Actions free tier) | £0 (GitHub Actions free tier) |
-| Monitoring | £0 (UptimeRobot free tier) | £0 (UptimeRobot free tier) |
+| Monitoring | £0 (free tier tools available) | £0 (free tier tools available) |
 | Electricity | ~£10/year | N/A |
 | **Year 1 total** | **~£170** | **£190-580** |
 | **Year 2+ total** | **~£10/year** | **£190-580/year** |

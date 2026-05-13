@@ -25,9 +25,9 @@ Upfront honesty: this isn't free to run.
 | What you need | Cost | Notes |
 |---------------|------|-------|
 | AI agent (Claude Code) | ~75/month | Min spec = Anthropic's Max subscription (~£75/month), but use the appropriate model for the job else you'll consistently hit rate limits on heavy agentic workloads. (Note that their Pro (~£16/month) is impractical for this system.)  Other AI tools with similar capabilities may work. |
-| Kanban board | £0 to ~£38/month | Required. Free: Trello, GitHub Projects (or build your own). Paid: [Businessmap](https://businessmap.io/sign-up?referral_code=smagile30) (from ~£38/month for 5 users, 30-day trial; [request a 90-day trial](https://n8n.smagile.co/form/akb-trial)) has the best Kanban semantics and API. |
+| Kanban board | £0 to ~£38/month | Required. Free: Trello, GitHub Projects (or build your own). Paid: [Businessmap](https://businessmap.io/sign-up?referral_code=smagile30) (from ~£38/month for 5 users, 30-day trial; [request a 90-day trial](https://n8n.smagile.co/form/akb-trial)) has stronger Kanban semantics and a more capable API than most alternatives. |
 | Everything else | £0 | Database, networking, automation, monitoring all have free tiers. |
-| Hardware (optional) | ~£160 one-time | Only if you self-host instead of using cloud services.  Consider Netlify for cloudhosting as an alternative (see tools). |
+| Hardware (optional) | ~£160 one-time | Only if you self-host instead of using cloud services.  Cloud platforms (Vercel, Railway, etc.) are a valid alternative. |
 | **Minimum to start** | **~£75/month** | AI subscription + free board tool. |
 
 See [TOOLS.md](TOOLS.md) for the full breakdown.
@@ -99,15 +99,15 @@ This matters because the alternative is worse than it looks. An agent that pushe
 
 The same logic applies to learning. Each completed task leaves behind a structured record -- what was hard, what to watch out for, which patterns hold for this codebase -- that the next agent working on something similar can read before starting. The board handles coordination across sessions; this handles accumulation of task-level knowledge that isn't general enough to go in the shared knowledge system but is too valuable to discard.
 
-### 7. Agents can talk to each other — without a shared context window
+### 7. Agents can talk to each other, without a shared context window
 
 This is the part most multi-agent systems get wrong, or skip entirely.
 
-The obvious approach — passing messages via shared files or direct calls — works for simple cases but breaks at scale: it couples agents to each other's availability, creates race conditions, and usually requires one agent to be "in charge" of routing. Most production systems work around this by putting a human in the middle: Agent A finishes, the human looks at the output, tells Agent B what to do next.
+The obvious approach (passing messages via shared files or direct calls) works for simple cases but breaks at scale: it couples agents to each other's availability, creates race conditions, and usually requires one agent to be "in charge" of routing. Most production systems work around this by putting a human in the middle: Agent A finishes, the human looks at the output, tells Agent B what to do next.
 
 This blueprint proves a different model. Agents coordinate through the Kanban board itself.
 
-When Agent A needs Agent B's input, it posts a comment on the relevant card using a simple `[prefix]` convention. A Businessmap business rule fires on the comment event and — via a Cloudflare Worker proxy and n8n handler — creates a transient **inbox card** in a dedicated inbox column within seconds. Agent B polls that column on a schedule. When it sees a card addressed to it, it does the work, posts a response using Agent A's prefix to route the reply back, and closes the inbox card.
+When Agent A needs Agent B's input, it posts a comment on the relevant card using a simple `[prefix]` convention. A Businessmap business rule fires on the comment event and, via a Cloudflare Worker proxy and n8n handler, creates a transient **inbox card** in a dedicated inbox column within seconds. Agent B polls that column on a schedule. When it sees a card addressed to it, it does the work, posts a response using Agent A's prefix to route the reply back, and closes the inbox card.
 
 Neither agent needs to know the other is running. Neither needs to be available in real time. The board handles the routing.
 
@@ -121,11 +121,11 @@ Agent A posts [quality-guardian] on card #42
   → Lead Agent closes the loop
 ```
 
-**This is genuinely rare in production agentic systems.** Most multi-agent implementations rely on synchronous orchestration (bottleneck), shared markdown files (fragile), or comment-event webhooks that many board tools don't actually support (see [Mistakes we made](docs/mistakes-we-made.md)). The inbox card pattern survives all three failure modes because it uses the board's own data model as the messaging layer — push-delivered, asynchronous, and reliable.
+**This is genuinely rare in production agentic systems.** Most multi-agent implementations rely on synchronous orchestration (bottleneck), shared markdown files (fragile), or comment-event webhooks that many board tools don't actually support (see [Mistakes we made](docs/mistakes-we-made.md)). The inbox card pattern survives all three failure modes because it uses the board's own data model as the messaging layer: push-delivered, asynchronous, and reliable.
 
-The constraint is latency: this is async coordination, not real-time chat. Maximum wait times are 15 minutes for coordination-hub agents, up to 2 hours for project-delivery agents in dialogue. For planned delivery work — which is what Kanban is for — this is acceptable.
+The constraint is latency: this is async coordination, not real-time chat. Maximum wait times are 15 minutes for coordination-hub agents, up to 2 hours for project-delivery agents in dialogue. For planned delivery work, which is what Kanban is for, this is acceptable.
 
-One prerequisite worth stating explicitly: **each named role must have exactly one active instance at a time.** One orchestrator, one quality guardian, one project agent per domain. The inbox routing assumes one reader per prefix — two simultaneous Mosaic agents would both pick up the same inbox card. Sandbox agents (ephemeral, no prefix, no persistent loop) are the exception: you can have as many as you need.
+One prerequisite worth stating explicitly: **each named role must have exactly one active instance at a time.** One orchestrator, one quality guardian, one project agent per domain. The inbox routing assumes one reader per prefix; two simultaneous Mosaic agents would both pick up the same inbox card. Sandbox agents (ephemeral, no prefix, no persistent loop) are the exception: you can have as many as you need.
 
 Full design, polling intervals, implementation notes, and known failure modes: [docs/agent-communication.md](docs/agent-communication.md).
 
@@ -213,7 +213,6 @@ This system was built on a specific set of tools. See [TOOLS.md](TOOLS.md) for t
 Key components:
 - **[Claude Code](https://claude.ai/code)**: the AI agent platform (can read/write code, run commands, interact with APIs)
 - **A Kanban board with an API**: the patterns are tool-agnostic but the board tool's capabilities matter. This repo includes a CLI adapted for [Businessmap](https://businessmap.io), which was chosen because its API enables the automations this system depends on: native WIP limits, blocked-in-place semantics, two-level workflows (initiatives + cards), and built-in analytics (cycle time, throughput, SLE tracking). You can achieve similar results with Trello, Jira, or Azure DevOps using plugins and add-ons, but expect to bridge capability gaps, particularly around WIP enforcement and flow analytics. A homemade board will work for the core patterns but will likely lack the API surface needed for full automation.
-- **[Supabase](https://supabase.com)**: database and authentication (free tier)
 - **[Cloudflare](https://cloudflare.com)**: networking and tunnels for self-hosted services (free tier)
 - **[n8n](https://n8n.io)**: workflow automation between services (self-hosted, free)
 
@@ -248,7 +247,7 @@ You are not locked to a single model. You can set the model per agent based on t
 The files here aren't locked to one AI platform. In the production system, the same operating model, knowledge system, and board are used simultaneously by:
 
 - **Claude Code agents** (terminal-based: the main delivery engine)
-- **[OpenClaw](https://openclaw.ai) agents** (Discord-based: advisory, monitoring, and coordination). OpenClaw is a free, always-on agentic AI assistant. It runs for free, though you get the best results when pairing it with a paid LLM service.
+- **[OpenClaw](https://openclaw.ai) agents** (Discord-based: advisory, monitoring, and coordination). OpenClaw is a free, always-on agentic AI assistant. It runs for free, though results improve when pairing it with a paid LLM service.
 
 Both platforms read the same knowledge, interact with the same board, and contribute observations back to the same learning system. See [docs/cross-runtime.md](docs/cross-runtime.md) for how this works.
 
@@ -276,7 +275,7 @@ The current architecture is a product of those starting points combined with sus
 
 This is a free, open resource.  No catch, no paywall, no email gate.  If you find it useful and want to talk about agentic delivery, Kanban at scale, or how to adapt this to your setup, I'm happy to help.
 
-**James Farley** — [LinkedIn](https://www.linkedin.com/in/jsfarley/)
+**James Farley**: [LinkedIn](https://www.linkedin.com/in/jsfarley/)
 
 If you end up adapting any part of the blueprint, I would genuinely love to hear what you found useful, what you did not take, and any suggestions for improving it.  This thing gets better when people use it in contexts I have not thought of.
 
@@ -284,9 +283,8 @@ If you end up adapting any part of the blueprint, I would genuinely love to hear
 
 If you do decide to use any of the tools referenced here, using the affiliate links in this README and [TOOLS.md](TOOLS.md) helps support ongoing development at no additional cost to you.  In some cases you get a better deal:
 
-- **[Businessmap](https://businessmap.io/sign-up?referral_code=smagile30)** — this link gives you a 30-day free trial (their public site offers 14 days).  If you would like a 90-day trial, [request one here](https://n8n.smagile.co/form/akb-trial) and I will send it straight to your inbox.
-- **[UptimeRobot](https://uptimerobot.com/?rid=5999e69f2482fe)** — free tier is generous; the link supports this project at no cost to you.
-- **[Claude Code free week](https://claude.ai/referral/37jyYYj-wg)** — referral link for a free trial week of Claude Code, the AI agent platform this system is built on.
+- **[Businessmap](https://businessmap.io/sign-up?referral_code=smagile30)**: this link gives you a 30-day free trial (their public site offers 14 days).  If you would like a 90-day trial, [request one here](https://n8n.smagile.co/form/akb-trial) and I will send it straight to your inbox.
+- **[Claude Code free week](https://claude.ai/referral/37jyYYj-wg)**: referral link for a free trial week of Claude Code, the AI agent platform this system is built on.
 
 The accompanying [Agentic Kanban Blueprint blog series](https://smagile.co/resources/blog/?series=Agentic%20Kanban%20Blueprint%20(AKB)) covers the ideas in this repo in more depth, including how the system was built and the mistakes made along the way.
 

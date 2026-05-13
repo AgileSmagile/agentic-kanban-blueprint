@@ -10,7 +10,7 @@ These are seeded from expert knowledge (licensed ProKanban.org trainer). Axiomat
   - source: seeded
 - **Manage flow.** Optimise for work finishing, not starting. Flow efficiency over resource efficiency.
   - source: seeded
-- **Make policies explicit.** Decisions encoded in board structure, card standards, operating model — not in people's heads.
+- **Make policies explicit.** Decisions encoded in board structure, card standards, operating model; not in people's heads.
   - source: seeded
 - **Implement feedback loops.** Board review, WIP age signal, SLE tracking are the feedback mechanisms.
   - source: seeded
@@ -32,7 +32,7 @@ These are seeded from expert knowledge (licensed ProKanban.org trainer). Axiomat
   - source: promoted
 - Block individual cards when downstream is full. Don't halt pulling entirely.
   - source: promoted
-- Blocked cards stay in Doing — they do not advance to Done or anywhere else until the block is resolved.
+- Blocked cards stay in Doing; they do not advance to Done or anywhere else until the block is resolved.
   - source: promoted
 
 ## Flow signals

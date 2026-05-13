@@ -94,7 +94,7 @@ Observed across 3 runs with different input sizes.
 
 ### The orchestrator's role
 
-The orchestrator reads the knowledge files at session start to understand what the system has learned. It flags contradictions, helps promote hypotheses that have earned enough evidence, and ensures demotions are human-reviewed. It does not write to the files — agents do, as part of their work.
+The orchestrator reads the knowledge files at session start to understand what the system has learned. It flags contradictions, helps promote hypotheses that have earned enough evidence, and ensures demotions are human-reviewed. It does not write to the files; agents do, as part of their work.
 
 This model eliminates the inbox altogether: learning is captured where work happens (card comments and knowledge files), not in a separate collection point.
 
@@ -124,9 +124,9 @@ The `INDEX.md` file maps domains to their scope and tells agents when to consult
 
 ### Before starting a card
 
-1. Read `knowledge/INDEX.md` — identify which domains apply
-2. Read `rules.md` for each relevant domain — apply by default
-3. Scan `hypotheses.md` — note if today's work can test or refute any hypothesis
+1. Read `knowledge/INDEX.md` to identify which domains apply
+2. Read `rules.md` for each relevant domain and apply by default
+3. Scan `hypotheses.md` to note if today's work can test or refute any hypothesis
 
 This takes an agent 30 seconds and prevents it from repeating known mistakes or ignoring confirmed patterns.
 

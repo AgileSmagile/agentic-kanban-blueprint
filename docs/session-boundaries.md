@@ -145,7 +145,7 @@ This means you should be deliberate about what persists and where:
 
 ## Mid-session continuity: the compaction snapshot
 
-The persistence layers above (card comments, knowledge files, CLAUDE.md) all assume a clean session boundary: work ends, agent writes, agent exits. But context compaction introduces a different failure mode. Compaction does not end the session — it truncates the context window mid-flight to free capacity. The agent continues, but with a compressed summary instead of the full conversation. Whatever was in working memory but not yet written anywhere is gone.
+The persistence layers above (card comments, knowledge files, CLAUDE.md) all assume a clean session boundary: work ends, agent writes, agent exits. But context compaction introduces a different failure mode. Compaction does not end the session; it truncates the context window mid-flight to free capacity. The agent continues, but with a compressed summary instead of the full conversation. Whatever was in working memory but not yet written anywhere is gone.
 
 The standard advice ("write to knowledge files as you go") helps but does not fully solve this. An agent mid-task has not yet reached a natural checkpoint. It knows what it just decided, what it was about to do next, and what the open questions are. None of that is on the board yet. None of it is in a knowledge file. It was going to be written at the end of the card.
 
@@ -153,7 +153,7 @@ Compaction fires before that end arrives.
 
 ### The fix: a pre-compaction snapshot
 
-Claude Code supports a `PreCompact` hook that fires immediately before context is compressed. If the hook is a `prompt` type (not a `command` type), it injects a user turn into the live conversation — which means the agent has full context and full tool access when it fires. The agent can write a file.
+Claude Code supports a `PreCompact` hook that fires immediately before context is compressed. If the hook is a `prompt` type (not a `command` type), it injects a user turn into the live conversation, which means the agent has full context and full tool access when it fires. The agent can write a file.
 
 The pattern:
 
@@ -163,11 +163,11 @@ The pattern:
 
 3. **PostCompact prompt hook** instructs the agent to read the snapshot file and re-establish working context. The agent continues from where it left off, not from a cold start.
 
-The snapshot file is overwritten on each compaction. It is not a log; it is a single point-in-time capture of working state. Between compactions it sits on disk doing nothing. It persists across sessions too — if a session ends abruptly without a wrap-up, the snapshot from the last compaction is still there.
+The snapshot file is overwritten on each compaction. It is not a log; it is a single point-in-time capture of working state. Between compactions it sits on disk doing nothing. It persists across sessions too: if a session ends abruptly without a wrap-up, the snapshot from the last compaction is still there.
 
 ### Why prompt type, not command type
 
-A `command` hook executes a shell script. Shell scripts can write files, but they cannot access the conversation context — they only know that a hook fired. Any "snapshot" they write is generic and static.
+A `command` hook executes a shell script. Shell scripts can write files, but they cannot access the conversation context; they only know that a hook fired. Any "snapshot" they write is generic and static.
 
 A `prompt` hook injects a user turn. The agent sees the prompt with full awareness of what it was doing. It writes a snapshot that is specific, accurate, and actionable. This is the meaningful difference.
 

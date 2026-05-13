@@ -98,7 +98,7 @@ If you make a decision in your head but don't update the board or the guidelines
 
 When you catch yourself thinking "they should know that," ask: where is it written? If it's nowhere, write it. The board, the CLAUDE.md, the knowledge system, a card comment: anywhere persistent is better than your head.
 
-### Accept that you are the constraint — then reduce the constraint
+### Accept that you are the constraint, then reduce the constraint
 
 In an agentic system, the human is almost always the bottleneck. Not because you're slow, but because you're the only one who can do certain things (set direction, validate product, manage compliance, maintain relationships). The system is designed to maximise what agents can do without you, so that your limited time is spent on the things only you can do.
 

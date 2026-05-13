@@ -7,8 +7,8 @@ Testing ground for the agentic Kanban experiment. Each needs 5+ independent conf
 ### H1: WIP age alone is a sufficient autonomous pull signal
 Conjecture: An agent checking board age on session start will make better pull decisions than one relying on human direction.
 Status: insufficient data
-Evidence for: —
-Evidence against: —
+Evidence for: none yet
+Evidence against: none yet
 Test: Track pull decision quality against WIP age data across sessions. Compare outcomes when agent pulled autonomously vs. when PO directed.
 
 ### H2: No authoritative trigger is needed for autonomous pull
@@ -17,7 +17,7 @@ Status: partially supported
 Evidence for: Sessions where agent pulls immediately tend to produce more throughput. Board-only operation worked on multiple occasions.
 Evidence against: Agent waited for "go" in pre-feedback sessions. Possible confound: behaviour changed after explicit feedback, not purely board-driven.
 Confirmations: ~2-3
-Test: Track next 5 sessions — did agent pull correctly without prompting?
+Test: Track next 5 sessions; did agent pull correctly without prompting?
 
 ### H3: Agents can maintain Kanban discipline across sessions without human reminder
 Conjecture: With the board as source of truth and a proper startup ritual, agents won't need the PO to remind them of WIP state or pull discipline.
@@ -32,8 +32,8 @@ Status: brand new
 Test: Track frequency of repeated corrections over next 10 sessions.
 
 ### H5: Rules without a last_updated timestamp become silently stale
-Conjecture: Adding a last_updated date to each rule entry would let agents detect staleness ("this rule is 30+ days old and relates to infrastructure — verify before acting") without needing a full review cycle.
-Status: 1 observation (board restructure — column renaming propagated to rules.md but agents running before the update operated on stale knowledge with no signal)
+Conjecture: Adding a last_updated date to each rule entry would let agents detect staleness ("this rule is 30+ days old and relates to infrastructure; verify before acting") without needing a full review cycle.
+Status: 1 observation (board restructure: column renaming propagated to rules.md but agents running before the update operated on stale knowledge with no signal)
 Evidence count: 1
 Test: Track how often agents act on stale rule information over the next 10 sessions.
 

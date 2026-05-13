@@ -12,7 +12,7 @@ If you have Businessmap with business rules enabled, stop here and read [agent-c
 
 ## How it works
 
-Without push notification, agents must detect new comments themselves.  A **Board Watcher** — a separate, continuously running workflow — polls the Businessmap API on a schedule, scans for `[prefix]` mentions in recent comments, and creates inbox cards for the target agent.
+Without push notification, agents must detect new comments themselves.  A **Board Watcher** (a separate, continuously running workflow) polls the Businessmap API on a schedule, scans for `[prefix]` mentions in recent comments, and creates inbox cards for the target agent.
 
 ```
 Agent A posts [B-prefix] comment on a card
@@ -74,7 +74,7 @@ Mitigations:
 
 **API key drift.**  If the Board Watcher reads its API key from a file rather than directly from the secrets store, that file can drift when keys are rotated.  Symptom: Board Watcher stops creating inbox cards silently.  Fix: check the key file, re-sync from the secrets store.
 
-**Cascade.**  An agent response comment that triggers another notification creates an infinite loop.  Prevention: use `[notification/Agent-X]` (contains a slash) as the response prefix — the Board Watcher regex excludes it.
+**Cascade.**  An agent response comment that triggers another notification creates an infinite loop.  Prevention: use `[notification/Agent-X]` (contains a slash) as the response prefix; the Board Watcher regex excludes it.
 
 **Missed events between polls.**  If a card moves columns between Board Watcher cycles and the new column is not in the scanned set, comments posted during that window are missed permanently.
 

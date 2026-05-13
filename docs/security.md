@@ -574,7 +574,7 @@ SOC 2 is organised around five trust service criteria. The operating model addre
 | Criteria | How this system aligns |
 |----------|----------------------|
 | **Security** | Network isolation (DMZ), encrypted secrets, pre-push security scans, autonomy boundaries preventing agents from deploying without approval |
-| **Availability** | Health monitoring (UptimeRobot), blue-green deploys with health-check gates, zero-downtime deploy patterns |
+| **Availability** | Health monitoring (free-tier tools such as UptimeRobot work well), blue-green deploys with health-check gates, zero-downtime deploy patterns |
 | **Processing integrity** | Board as single source of truth, atomic commits, CI/CD pipeline as quality gate, fail-first TDD |
 | **Confidentiality** | Secrets policy (never display), encrypted at rest, RLS at database level, agent scope boundaries |
 | **Privacy** | GDPR alignment (see above), data minimisation, right to deletion |
@@ -636,7 +636,7 @@ Security testing is built into the delivery cycle, not treated as a periodic ext
 
 - **Pre-push security scan**: every branch push checks for npm vulnerabilities (HIGH/CRITICAL), hardcoded secret patterns, `eval()` usage, `dangerouslySetInnerHTML`, and accidentally committed `.env` files. FAIL = blocked.
 - **Dependency audit**: `npm audit` runs as part of the code health workflow (daily + on push). Vulnerabilities are surfaced as board cards and tracked through the normal workflow.
-- **OWASP top 10 awareness**: agents are instructed to avoid introducing common web application vulnerabilities from the [OWASP](https://owasp.org) (Open Worldwide Application Security Project) list, including command injection, XSS (cross-site scripting — where malicious code is injected into web pages viewed by other users), and SQL injection. This is instruction-level defence, reinforced by code review in PRs.
+- **OWASP top 10 awareness**: agents are instructed to avoid introducing common web application vulnerabilities from the [OWASP](https://owasp.org) (Open Worldwide Application Security Project) list, including command injection, XSS (cross-site scripting, where malicious code is injected into web pages viewed by other users), and SQL injection. This is instruction-level defence, reinforced by code review in PRs.
 
 **Periodic practices:**
 

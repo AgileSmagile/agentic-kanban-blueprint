@@ -23,13 +23,13 @@ This distinction matters for cost and coherence: sandbox agents are ephemeral, c
 
 Not all board tools support all features of this pattern.  The requirements depend on which tier of agent communication you want.
 
-**Tier 1 — Basic operating model (any board with an API)**
+**Tier 1: Basic operating model (any board with an API)**
 
 Any board tool with a REST or GraphQL API supports the core blueprint: agents read the board state, pull cards, update cards, and post comments.  Trello, GitHub Projects, Linear, Jira, and Businessmap all qualify.  For the basic single-agent or manually-coordinated multi-agent setup, board choice is genuinely tool-agnostic.
 
-**Tier 2 — Push-based agent-to-agent communication (enabled by Businessmap + n8n)**
+**Tier 2: Push-based agent-to-agent communication (enabled by Businessmap + n8n)**
 
-The inbox card pattern described in this document — where Agent A posts a comment and Agent B receives an inbox card within seconds — is made possible by two specific components working together:
+The inbox card pattern described in this document, where Agent A posts a comment and Agent B receives an inbox card within seconds, is made possible by two specific components working together:
 
 1. **Businessmap's business rules engine**, which supports "Comment (new)" as a trigger and "invoke web service" as the action.  This fires immediately when a comment is posted on any card in scope.
 2. **n8n** (self-hosted, free), which acts as the webhook handler: fetching the comment via the Businessmap API, extracting the routing prefix, and creating the inbox card.
@@ -39,7 +39,7 @@ This combination has been tested in production.  Alternatives were evaluated and
 - **Trello:** no comment-event triggers in the webhook system
 - **GitHub Projects:** no business rules engine; webhooks fire on issue events, not comments in this sense
 - **Linear:** webhooks exist but do not support comment-event triggers with external invocation in the same way
-- **Direct Businessmap webhooks (without n8n):** Businessmap does not expose the comment body in the webhook payload — you need the API call in n8n to fetch it
+- **Direct Businessmap webhooks (without n8n):** Businessmap does not expose the comment body in the webhook payload; you need the API call in n8n to fetch it
 
 If you are not on Businessmap, or on a plan without business rules access, the polling fallback in [agent-communication-workaround.md](agent-communication-workaround.md) provides the same coordination pattern with higher latency (minutes rather than seconds).
 
@@ -92,7 +92,7 @@ Target agent picks up inbox card on next poll
 **Businessmap business rule** (configured per board in the UI)
 - Trigger: "Card is updated"
 - Predicate: "Comment (new)"
-- Action: "invoke web service" — POST to the Worker proxy URL with the Kanbanize Payload in the body
+- Action: "invoke web service": POST to the Worker proxy URL with the Kanbanize Payload in the body
 - The payload includes the card_id, which is all the downstream handler needs
 - Must be configured separately for each board
 
@@ -101,7 +101,7 @@ Target agent picks up inbox card on next poll
 - Validates requests via a secret token embedded in the URL path (`/hook/<secret>`)
 - Rate limits to prevent abuse or runaway loops
 - Forwards valid requests to the n8n webhook endpoint
-- Deployed on Cloudflare's edge network — no server to maintain
+- Deployed on Cloudflare's edge network; no server to maintain
 
 **n8n webhook handler** (on Clawbox Pi5)
 - Receives the forwarded POST
@@ -148,8 +148,8 @@ Neither agent needs to know the other is running.  Neither needs to be available
 | `@Agent-TestSpecialist` | Test Specialist | BM @mention, HTML-wrapped |
 
 The handler regex for `[prefix]` is `/\[([A-Za-z][A-Za-z0-9-]*)\]/`.  This deliberately excludes:
-- `[notification/Agent-X]` — contains a slash, used as agent response prefix
-- `[#nnn]` — starts with `#`, used in card title parent references
+- `[notification/Agent-X]`: contains a slash, used as agent response prefix
+- `[#nnn]`: starts with `#`, used in card title parent references
 
 Both are safe from false triggering without any special handling.
 
@@ -192,7 +192,7 @@ This keeps dialogue latency manageable without burning API calls on continuous p
 
 This pattern is **asynchronous coordination**, not real-time messaging.  The design target is a system where agents work independently on their own WIP, coordinate when needed, and do not depend on another agent being instantly available.
 
-Maximum wait windows (not average) — push-based delivery, agent polls own inbox on schedule:
+Maximum wait windows (not average), push-based delivery, agent polls own inbox on schedule:
 
 | Interaction | Max latency |
 |---|---|
@@ -210,7 +210,7 @@ If your system requires faster agent-to-agent response, you need a different com
 
 **Cascade.**  If an agent's response comment triggers the handler to notify another agent, and that agent's response triggers the first agent again, you get an infinite loop.  Prevention: agent responses must use a prefix that cannot match the detection pattern.  In the reference implementation, responses use `[notification/Agent-X]` (contains a slash) which the handler regex explicitly excludes.
 
-**Scanned column scope.**  The handler only creates inbox cards for comments on cards in specific columns (Doing, Done, Validation/Rework in the reference implementation).  A comment on a card in Backlog, Ready, or Shipped will not create an inbox card.  This is intentional — completed work should not generate new coordination overhead — but it can surprise agents who post a routing comment on the wrong card.
+**Scanned column scope.**  The handler only creates inbox cards for comments on cards in specific columns (Doing, Done, Validation/Rework in the reference implementation).  A comment on a card in Backlog, Ready, or Shipped will not create an inbox card.  This is intentional: completed work should not generate new coordination overhead.  It can still surprise agents who post a routing comment on the wrong card.
 
 ## Practical implementation
 

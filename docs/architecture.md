@@ -24,7 +24,7 @@ The Kanban board and the knowledge system are the coordination layers. They don'
          ┌────────────────┴───┐   ┌───────┴───────┐  ┌───┴────────────┐
          │  CC Orchestrator   │   │   Clawdius    │  │  Autonomous    │
          │  (Claude Code,     │   │   (OpenClaw,  │  │  Agents        │
-         │   local machine)   │   │    Pi 5,      │  │  (own board,   │
+         │   local machine)   │   │  self-hosted, │  │  (own board,   │
          │                    │   │    Discord)   │  │   own secrets, │
          │  Peer review,      │   │               │  │   own scope)   │
          │  risk surfacing,   │   │  Advisory,    │  │                │
@@ -46,7 +46,7 @@ The production system this blueprint was extracted from runs multiple orchestrat
 | Orchestrator | Runtime | Where it runs | Primary focus |
 |-------------|---------|--------------|---------------|
 | **CC Orchestrator** | Claude Code (Opus) | Local machine (terminal) | Senior peer: architectural review, risk surfacing, knowledge hygiene, continuous improvement |
-| **Clawdius** | OpenClaw (Haiku) | Raspberry Pi 5 (Discord) | Strategy, research, advisory, board management, inter-agent coordination |
+| **Clawdius** | OpenClaw (Haiku) | Self-hosted server (Discord) | Strategy, research, advisory, board management, inter-agent coordination |
 | **Satellite workspaces** | Claude Code (Sonnet/Opus) | Local machine (separate terminals) | Focused work outside the main delivery flow |
 
 Each orchestrator has its own persona, its own area of focus, and its own runtime. But they all share:
@@ -58,7 +58,7 @@ Each orchestrator has its own persona, its own area of focus, and its own runtim
 
 No orchestrator owns the board.  No orchestrator owns the knowledge system.  These are shared infrastructure that any agent can read from and write to.
 
-**Important: multiple orchestrators here means different runtimes with different scopes — not two CC orchestrators running simultaneously against the same board.** Within any given runtime and scope, the rule is one instance per named role. Two CC orchestrators hitting the same cards creates conflicts (see [Mistakes we made](mistakes-we-made.md)). Two of the same project agent creates duplicate inbox handling. The multiplicity in the table above works because each orchestrator has a distinct focus area, runtime, and set of responsibilities. See [agent-communication.md](agent-communication.md) for the full multiplicity rules.
+**Important: multiple orchestrators here means different runtimes with different scopes, not two CC orchestrators running simultaneously against the same board.** Within any given runtime and scope, the rule is one instance per named role. Two CC orchestrators hitting the same cards creates conflicts (see [Mistakes we made](mistakes-we-made.md)). Two of the same project agent creates duplicate inbox handling. The multiplicity in the table above works because each orchestrator has a distinct focus area, runtime, and set of responsibilities. See [agent-communication.md](agent-communication.md) for the full multiplicity rules.
 
 **Exception: autonomous agents.** An agent with its own mandate (e.g. an autonomous revenue experiment) may have its own board, its own secrets store, and its own scope entirely. It shares the knowledge system and communication channels (so it can learn from and coordinate with the team) but its operational infrastructure is separate. This is deliberate: autonomy means owning your own resources, not borrowing someone else's.
 
@@ -164,13 +164,11 @@ All orchestrators and agents ←→ Knowledge system (domain files, direct read/
 The system this blueprint was extracted from runs on:
 
 - **Local machine** (Windows): Claude Code sessions for the CC orchestrator, sub-agents, and satellite workspaces
-- **Raspberry Pi 5** (guest network DMZ): Clawdius (OpenClaw), Docker containers for self-hosted services, n8n workflows, health monitoring
-- **Cloudflare**: DNS, tunnels (exposing Pi services publicly without open ports), Workers (edge functions), Access (Zero Trust policies)
-- **Supabase**: Hosted Postgres with RLS for SaaS products
+- **Self-hosted server** (guest network DMZ): Clawdius (OpenClaw), Docker containers for self-hosted services, n8n workflows, health monitoring
+- **Cloudflare**: DNS, tunnels (exposing self-hosted services publicly without open ports), Workers (edge functions), Access (Zero Trust policies)
 - **GitHub**: Code hosting, CI/CD via Actions
-- **Netlify / Vercel**: Static site hosting, preview deployments
 
-This is one possible infrastructure shape. The multi-orchestrator pattern works with any combination of local, cloud, and self-hosted infrastructure. The requirement is shared access to the board and knowledge system, not co-location.
+This is one possible infrastructure shape. The multi-orchestrator pattern works with any combination of local, cloud, and self-hosted infrastructure. The requirement is shared access to the board and knowledge system, not co-location. See [hardware.md](hardware.md) for the self-hosting option.
 
 ## Security Model
 

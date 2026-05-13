@@ -104,7 +104,7 @@ The board is the foundation. Everything else builds on it.
 
 **Which board tool?** The patterns in this repo are tool-agnostic at the basic level, but the board *must* have an API for agents to interact with it automatically.  What you can do depends on which tier of the blueprint you want.
 
-**Tier 1 — Single agent or human-coordinated multi-agent (any board with an API)**
+**Tier 1: Single agent or human-coordinated multi-agent (any board with an API)**
 
 | Tool | API? | Free tier | Kanban features | Notes |
 |------|------|-----------|-----------------|-------|
@@ -114,11 +114,11 @@ The board is the foundation. Everything else builds on it.
 | [Jira](https://www.atlassian.com/software/jira) | Yes (REST) | Yes (up to 10 users) | Good | Feature-rich but complex. If you already use it, it works. |
 | [Businessmap](https://businessmap.io/sign-up?referral_code=smagile30) | Yes (REST) | [30-day trial](https://businessmap.io/sign-up?referral_code=smagile30), then from ~£38/month (5 users) | Excellent | Native WIP limits, blocked-in-place semantics, multi-layer workflow.  This is what the production system uses. |
 
-**Tier 2 — Push-based agent-to-agent communication (enabled by Businessmap + n8n)**
+**Tier 2: Push-based agent-to-agent communication (enabled by Businessmap + n8n)**
 
-The inbox card pattern — where agents notify each other through the board with near-instant delivery — is made possible by **Businessmap's business rules engine** (which triggers on comment events and invokes an external webhook) combined with **n8n** (self-hosted, free) as the handler that fetches the comment body and creates the inbox card.
+The inbox card pattern, where agents notify each other through the board with near-instant delivery, is made possible by **Businessmap's business rules engine** (which triggers on comment events and invokes an external webhook) combined with **n8n** (self-hosted, free) as the handler that fetches the comment body and creates the inbox card.
 
-This has been tested.  Trello, GitHub Projects, and Linear were evaluated and do not support comment-event triggers with external webhook invocation in the way needed.  Direct Businessmap webhooks without n8n also do not work, because Businessmap does not include the comment body in the webhook payload — you need the n8n API call to fetch it.
+This has been tested.  Trello, GitHub Projects, and Linear were evaluated and do not support comment-event triggers with external webhook invocation in the way needed.  Direct Businessmap webhooks without n8n also do not work, because Businessmap does not include the comment body in the webhook payload; you need the n8n API call to fetch it.
 
 Without Businessmap, agent-to-agent communication falls back to polling (see [agent-communication-workaround.md](agent-communication-workaround.md)), with latency measured in minutes rather than seconds.  For a single agent or a human-coordinated setup this is fine.  For a fully autonomous multi-agent estate, the push pattern is what makes it practical.
 
@@ -163,12 +163,12 @@ CLAUDE.md is the file that tells Claude Code how to behave for your project. It'
 Copy `orchestrator/CLAUDE.md` to the root of your orchestrator workspace. For each project directory, use the template in the agent-guidelines.md (under "Project CLAUDE.md template") to create a project-specific version.
 
 **Every project CLAUDE.md must include:**
-- **Agent operating model** — pointer to agent-guidelines.md with specific areas listed
-- **Key commands** — board CLI commands and infrastructure access. Agents can't use tools they don't know exist.
-- **Communication** — standalone section: "Be direct, honest, specific. No flattery. Challenge questionable ideas, push back, and ask questions wherever they come up. Do not wait for a retrospective to surface continuous improvement ideas."
-- **Secrets policy** — standalone section, not a pointer. How secrets are managed, what agents must never do with values.
-- **Domain knowledge** — which knowledge domains are relevant to this project
-- **Hosting and deployment** — where it runs, how it's deployed, environment separation
+- **Agent operating model**: pointer to agent-guidelines.md with specific areas listed
+- **Key commands**: board CLI commands and infrastructure access. Agents can't use tools they don't know exist.
+- **Communication**: standalone section: "Be direct, honest, specific. No flattery. Challenge questionable ideas, push back, and ask questions wherever they come up. Do not wait for a retrospective to surface continuous improvement ideas."
+- **Secrets policy**: standalone section, not a pointer. How secrets are managed, what agents must never do with values.
+- **Domain knowledge**: which knowledge domains are relevant to this project
+- **Hosting and deployment**: where it runs, how it's deployed, environment separation
 
 The communication and secrets sections are standalone (not just pointers to the guidelines) because they're too important to risk a sub-agent missing. A few lines of duplication is cheaper than leaked secrets or sycophantic output.
 

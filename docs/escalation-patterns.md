@@ -10,8 +10,8 @@ Good escalation is the middle ground: the agent recognises it is stuck or out of
 
 The [agent guidelines](../orchestrator/agent-guidelines.md) define two escalation mechanisms:
 
-1. **Specialist dispatch** — mid-task tagging of the Quality Guardian or Orchestrator when specific signals are detected (auth touched, rework cycles > 2, architectural decisions, etc.)
-2. **Age-based intervention** — the Flow Guardian monitors card age against service level expectations and nudges at the 50th, 70th, and 85th percentile thresholds.
+1. **Specialist dispatch**: mid-task tagging of the Quality Guardian or Orchestrator when specific signals are detected (auth touched, rework cycles > 2, architectural decisions, etc.)
+2. **Age-based intervention**: the Flow Guardian monitors card age against service level expectations and nudges at the 50th, 70th, and 85th percentile thresholds.
 
 Both are well-documented and work in production.  This document extends them with patterns for situations those mechanisms do not cover.
 

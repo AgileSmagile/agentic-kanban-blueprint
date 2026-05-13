@@ -1,6 +1,6 @@
 # Mistakes We Made
 
-These are real failures from the production system this blueprint was extracted from. Each one cost time, trust, or both. The fixes are all "fix forward" — we didn't undo or revert; we built better systems that made the failure impossible to repeat.
+These are real failures from the production system this blueprint was extracted from. Each one cost time, trust, or both. The fixes are all "fix forward": we didn't undo or revert; we built better systems that made the failure impossible to repeat.
 
 ## Secrets exposed in conversation output
 
@@ -53,7 +53,7 @@ These are real failures from the production system this blueprint was extracted 
 
 **Fix forward:**
 - Added to agent guidelines: "A card with an empty or stub description must never be created"
-- Reframed card creation as a minimum-spec exercise: What, Why, Done When. If an agent can't write a meaningful "done when," the work isn't understood well enough — it should go to For Evaluation, not Ready
+- Reframed card creation as a minimum-spec exercise: What, Why, Done When. If an agent can't write a meaningful "done when," the work isn't understood well enough; it should go to For Evaluation, not Ready
 - Added the principle: "The board is the only continuity mechanism across agent sessions. If the card doesn't carry the intent, the intent is lost."
 
 **The lesson:** Context that feels obvious during creation is invisible after a session boundary. Every card is a message to a stranger.
@@ -67,7 +67,7 @@ These are real failures from the production system this blueprint was extracted 
 **Fix forward:**
 - Added an epistemic status note to the knowledge base: acknowledge that seeded entries are "informed beliefs, not validated facts" until confirmed by actual use
 - Added the principle: "A memory that names a specific function, file, or flag is a claim that it existed when the memory was written. Before recommending it, verify it still exists."
-- Distinguished between durable knowledge (principles, patterns, user preferences) and perishable knowledge (file paths, function names, API details) — the latter needs periodic verification
+- Distinguished between durable knowledge (principles, patterns, user preferences) and perishable knowledge (file paths, function names, API details); the latter needs periodic verification
 
 **The lesson:** A knowledge system that can't forget is as dangerous as one that can't remember. Build in verification, not just accumulation.
 
@@ -79,7 +79,7 @@ These are real failures from the production system this blueprint was extracted 
 
 **Fix forward:**
 - Added explicit policy: "Done is full (at WIP limit): block the card in Doing with reason 'Done at capacity'"
-- Added the principle: "Block individual cards when downstream is full, not the pull itself" — agents should keep pulling new work for cards that can ship directly, only blocking those that need the full Done column
+- Added the principle: "Block individual cards when downstream is full, not the pull itself"; agents should keep pulling new work for cards that can ship directly, only blocking those that need the full Done column
 - Combined Doing + Done + Validation as active WIP for flow monitoring, so the system treats downstream congestion as a visible signal
 
 **The lesson:** Local optimisation breaks system flow. Agents need to check downstream capacity, not just their own column.
