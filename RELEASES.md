@@ -48,7 +48,8 @@ The wrap-up checklist step count remains at 9. Step 6 now produces two outputs i
 
 ### Commits
 
-- [pending]
+- `f89d2d5` — Merge feat/memory-synthesis-and-obsidian: human knowledge layer (card #1332)
+- `1906db6` — docs: add human knowledge layer (Obsidian, daily log, memory synthesis)
 
 ---
 
