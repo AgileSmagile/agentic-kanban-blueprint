@@ -358,6 +358,92 @@ This is why PostToolUse scanning is essential even with perfect PreToolUse block
 - Run pre-push scans for secret patterns
 - When a secret is exposed, rotate immediately; don't assume the exposure was limited
 
+## Retry loop detection
+
+A different class of problem from secrets exposure: agents brute-forcing the same failing approach.  An agent that hits a build error will often retry the same command, tweak one character, retry again, and repeat until it exhausts the context window.  This burns tokens without progress and is the agentic equivalent of a developer staring at the same error for an hour without stepping back.
+
+### The hook
+
+A PostToolUse hook tracks consecutive tool failures and escalates through three stages:
+
+1. **Nudge** (5 consecutive failures): gentle reminder to reconsider the approach
+2. **Warning** (7 consecutive failures): explicit instruction to try something fundamentally different
+3. **Hard stop** (9 consecutive failures): agent is told to stop, escalate to the orchestrator, and pull other work
+
+The streak resets to zero on any successful tool call.  This prevents false escalation from interleaved successes and failures.
+
+```bash
+#!/bin/bash
+# retry-loop-detector.sh — Detects agents brute-forcing the same problem
+# Fires on PostToolUse.  Tracks consecutive failures and escalates.
+
+STATE_FILE="$HOME/.claude/hooks/.retry-loop-state"
+NUDGE_AT="${RETRY_NUDGE_THRESHOLD:-5}"
+WARN_AT="${RETRY_WARN_THRESHOLD:-7}"
+STOP_AT="${RETRY_STOP_THRESHOLD:-9}"
+
+INPUT=$(cat)
+
+TOOL_NAME=$(echo "$INPUT" | node -e "
+  const d=JSON.parse(require('fs').readFileSync(0,'utf8'));
+  process.stdout.write(d.tool_name || 'unknown');
+" 2>/dev/null)
+
+IS_ERROR=$(echo "$INPUT" | node -e "
+  const d=JSON.parse(require('fs').readFileSync(0,'utf8'));
+  const resp = d.tool_response || {};
+  const out = JSON.stringify(resp.stdout || resp.stderr || resp.output || '');
+  const hasError = /error|Error|ERROR|FAIL|fail|Permission denied|not found|timed out|exit code [1-9]/.test(out);
+  process.stdout.write(hasError ? '1' : '0');
+" 2>/dev/null)
+
+if [ "$IS_ERROR" != "1" ]; then
+  [ -f "$STATE_FILE" ] && echo "0|success|$(date +%s)" > "$STATE_FILE"
+  exit 0
+fi
+
+STREAK=0
+[ -f "$STATE_FILE" ] && STREAK=$(cut -d'|' -f1 "$STATE_FILE" 2>/dev/null || echo 0)
+STREAK=$((STREAK + 1))
+echo "${STREAK}|${TOOL_NAME}|$(date +%s)" > "$STATE_FILE"
+
+if [ "$STREAK" -ge "$STOP_AT" ]; then
+  echo "0|stopped|$(date +%s)" > "$STATE_FILE"
+  echo "[RETRY LOOP DETECTED] $STREAK consecutive failures. STOP." >&2
+  echo "Tag the orchestrator. Pull other work if capacity exists." >&2
+elif [ "$STREAK" -ge "$WARN_AT" ]; then
+  echo "[WARNING] $STREAK consecutive failures. Try a fundamentally different approach." >&2
+elif [ "$STREAK" -ge "$NUDGE_AT" ]; then
+  echo "[retry] $STREAK consecutive failures on $TOOL_NAME. Step back and reconsider." >&2
+fi
+exit 0
+```
+
+### Tuning
+
+The thresholds (5/7/9) are calibrated for agents that occasionally hit transient failures (rate limits, network timeouts) without triggering false escalation.  Lower thresholds (3/5/7) are appropriate for systems where every tool call should succeed; higher thresholds for systems with unreliable external dependencies.
+
+The error detection regex is intentionally broad.  It matches "error", "Error", "FAIL", "Permission denied", "not found", "timed out", and non-zero exit codes.  This can produce false positives on output like "0 errors found", but the high threshold absorbs this: five consecutive false positives without a single success is extremely unlikely during normal operation.
+
+### Registration
+
+Add the hook alongside `block-secrets.sh` in your `settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": { "tool_name": "Bash" },
+        "hooks": [
+          { "type": "command", "command": "bash \"$HOME/.claude/hooks/retry-loop-detector.sh\"" }
+        ]
+      }
+    ]
+  }
+}
+```
+
 ## Compaction resilience: keeping safety rules in context
 
 AI agents operating under large instruction sets (700+ lines of operating model, project-specific rules, domain knowledge) face a structural risk: when the context window fills and the model compresses prior messages, safety instructions degrade first.  The model retains what seems most relevant to the current task and discards "background" constraints.  Secrets policy, GDPR requirements, and autonomy boundaries are exactly the kind of content that gets compressed away.
