@@ -1,5 +1,57 @@
 # Release Notes
 
+## v1.8.0 — Cross-agent review triggers, mechanical sentinels, and context-aware hooks
+
+**Release date:** 2026-05-18
+
+### What changed
+
+**1. Cross-agent review triggers** (`docs/quality-gates.md`, `docs/agent-communication.md`)
+- New section in quality-gates.md defining mandatory review triggers: when agents MUST tag the Quality Guardian or Orchestrator before merging
+- Trigger categories: auth/session changes, database migrations, API contract changes, billing/payment, PII handling, webhook handlers, cross-project dependencies, architectural deviations
+- Tiered review model table showing human involvement and agent involvement as independent dimensions: a card can be Tier 1 for the human (auto-merge) but Tier 2 for the Quality Guardian (auth change needs eyes)
+- Cross-reference added to agent-communication.md distinguishing voluntary coordination from mandatory review
+
+**2. Mechanical sentinels** (`docs/quality-gates.md`)
+- New section documenting four sentinel patterns: tests that enforce architectural invariants at commit time
+- Route auth coverage: scans all API routes, verifies each has auth or is explicitly exempted with a documented reason
+- RLS verification: scans database migrations, verifies every table has row-level security enabled
+- Secret exposure: scans source files for hardcoded API keys, tokens, and credentials
+- Dependency audit: blocks commits when critical npm vulnerabilities exist
+- Framing: "these are not tests for what the code does; they are tests for what the code must always be true of"
+
+**3. Context-aware review trigger hook** (`docs/review-trigger-hook.md`, new)
+- A PostToolUse hook that checks `git diff` against trigger patterns and reminds agents to tag reviewers only when they are actually modifying triggerable files
+- Non-blocking (awareness, not enforcement), throttled (every 50 tool calls), context-aware (no noise when editing CSS)
+- Full reference implementation with configuration, tuning guidance, and pattern customisation
+- Positioned as the "social sense" equivalent for agentic systems: "in a human team, a developer touching auth code would naturally mention it in standup; agents don't have that instinct unless you build it"
+- Defence-in-depth framing: policy (guidelines) -> awareness (this hook) -> enforcement (sentinels) -> routing (inbox)
+
+### Why this matters
+
+- **The gap between knowing and doing.** The quality gates document already defined the Quality Guardian role and non-negotiable concerns. But there was no mechanism telling agents WHEN to engage the guardian. Agents had to remember, which meant they forgot. The triggers make it explicit; the hook makes it contextual; the sentinels make it mechanical.
+- **Human and agent review are independent dimensions.** Previously, the graduated autonomy model covered agent-to-human escalation (Tier 1 auto-merge through Tier 3 full review). Agent-to-agent review was undocumented. Now both dimensions are defined, and the tiered review table makes the interaction visible.
+- **Sentinels shift quality left.** Traditional quality gates catch problems at review time. Sentinels catch them at commit time. The commit cannot land without auth, RLS, and secret hygiene being addressed. This eliminates entire categories of findings from review.
+- **Context-aware hooks are a new pattern.** Flow nudges fire periodically regardless of context (useful for discipline reinforcement). The review trigger hook fires only when relevant files are modified (useful for situation awareness). Both are PostToolUse; they serve different purposes.
+
+### Action for teams using this blueprint
+
+- **Define your review triggers.** Read the trigger categories in quality-gates.md and adapt them to your system. Which file patterns in YOUR codebase should trigger cross-agent review?
+- **Deploy sentinels to your highest-risk projects first.** Start with route auth coverage (catches unprotected endpoints) and secret exposure (catches leaked credentials). These are the highest-value, lowest-effort sentinels.
+- **Install the review trigger hook.** Copy `review-trigger-check.sh` from the reference implementation, adapt the patterns, register in your settings.json. Test it by modifying an auth file and confirming the reminder appears.
+- **Update your agent guidelines.** Add a "MUST TAG for cross-agent review" section with your trigger list. The guidelines define the policy; the hook provides awareness; the sentinels enforce.
+
+### No breaking changes
+
+All existing implementations continue to work. The new sections in quality-gates.md and agent-communication.md are additive. The hook and sentinels are opt-in.
+
+### Commits
+
+- `0223c1d` — docs: add cross-agent review triggers and sentinel patterns
+- `ddda1fb` — docs: add context-aware review trigger hook pattern
+
+---
+
 ## v1.7.0 — Memory synthesis, daily logs, and Obsidian as knowledge vault
 
 **Release date:** 2026-05-13
