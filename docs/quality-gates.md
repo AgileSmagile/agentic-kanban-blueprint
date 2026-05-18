@@ -156,6 +156,64 @@ You'll know you've got this right when:
 
 ---
 
+## Cross-Agent Review Triggers
+
+The [graduated autonomy](graduated-autonomy.md) model defines when agents need the **human's** involvement (Tier 1 auto-merge, Tier 2 confirm, Tier 3 full review). This section defines when agents need **each other's** involvement. These are complementary dimensions, not alternatives.
+
+**The principle:** most work ships without cross-agent review. Mechanical sentinels (auth coverage, RLS verification, secret exposure scanning, dependency audits) catch the majority of security regressions automatically at commit time. Cross-agent review is reserved for changes where automated gates cannot assess correctness: architectural decisions, cross-project contracts, compliance judgment calls, and business logic in high-risk domains.
+
+### When to tag the Quality Guardian
+
+Tag for review when your card:
+- Adds or modifies authentication, session handling, or authorisation logic
+- Adds a database migration (new table, altered access policies, schema change)
+- Changes an API contract consumed by another project
+- Touches billing, payment, or subscription flows
+- Handles personal data (collection, storage, processing, or deletion)
+- Adds a new external integration or webhook handler
+
+### When to tag the Orchestrator
+
+Tag for review when your card:
+- Changes something that affects another project's work (shared API, shared dependency, environment variable)
+- Adds a new external dependency (package, SaaS integration, infrastructure component)
+- Makes an architectural decision not covered by existing documentation
+- Proposes to deviate from an established pattern in the operating model
+
+### When no tag is needed
+
+- All mechanical sentinels pass
+- Change is within your project's existing patterns and conventions
+- No cross-project impact
+- Card qualifies for Tier 1 auto-merge
+
+### Tiered review model (complete picture)
+
+| Dimension | Tier 1 (auto) | Tier 2 (confirm) | Tier 3 (full review) |
+|---|---|---|---|
+| **Human involvement** | None (CI green, small diff) | Confirm before merge | Card goes through Done column |
+| **Quality Guardian** | None (sentinels pass) | Tag in card comment | Three Amigos before build starts |
+| **Orchestrator** | None (single-project scope) | Tag in card comment | Architecture discussion on card |
+
+A card can be Tier 1 for human involvement but Tier 2 for the Quality Guardian (e.g. a small auth change that passes CI but touches session handling). The tiers are independent.
+
+### What happens after tagging
+
+The tagged agent picks up the request via their inbox. They respond on the card with approval or findings. If findings are blocking, they create follow-up cards or block the original. If the tagged agent is not running, the watch-card pattern applies (auto-block after the configured timeout with a comment for the human).
+
+### Mechanical sentinels: the first line of defence
+
+Before cross-agent review even comes into play, mechanical sentinels catch the most common regressions at commit time. These are tests that enforce architectural invariants, not behaviour:
+
+- **Route auth coverage:** scans all API routes, verifies each has authentication or is explicitly exempted with a documented reason. A new route without auth fails pre-commit.
+- **RLS verification:** scans database migrations, verifies every table has row-level security enabled. A new table without RLS fails pre-commit.
+- **Secret exposure:** scans source files for patterns matching hardcoded API keys, tokens, and credentials. A pasted secret fails pre-commit.
+- **Dependency audit:** runs security audit on dependencies. Critical vulnerabilities block the commit.
+
+These sentinels are not tests for what the code does. They are tests for what the code must always be true of. The policy is the code.
+
+---
+
 ## Mechanical Enforcement
 
 Policy documentation (CLAUDE.md, agent guidelines) tells agents what to do. Mechanical gates stop them when they don't. Both are needed; when they conflict, the mechanic wins.

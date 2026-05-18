@@ -271,3 +271,9 @@ bmap comment 1087 "New practice rolled out (Husky + coverage thresholds) across 
 | Escalating a blocker to the human | Block the card with native block functionality and add a comment |
 
 **The default should be self-service.**  If the orchestrator or another agent can answer a question, use the board.  The human owns strategy and priorities; agents own coordination.
+
+### When to tag for review (mandatory triggers)
+
+The table above covers voluntary coordination.  There are also **mandatory** review triggers: situations where an agent must tag another agent before merging, regardless of whether they feel they need input.  These are defined in [quality-gates.md](quality-gates.md#cross-agent-review-triggers) and cover changes to auth, database schema, API contracts, billing, PII handling, and cross-project dependencies.
+
+These triggers complement the human involvement tiers in [graduated-autonomy.md](graduated-autonomy.md).  A card can be Tier 1 for human involvement (auto-merge) but still require a Quality Guardian tag (e.g. a small auth fix).  The two dimensions are independent.
