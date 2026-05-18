@@ -232,6 +232,7 @@ See `knowledge/quality-engineering/rules.md` for the full rule set. See `knowled
 ## References
 
 - [test-depth-model.md](test-depth-model.md): Five-level test depth model and agentic-specific testing practices
+- [review-trigger-hook.md](review-trigger-hook.md): Context-aware hook that reminds agents to tag reviewers during development
 - [personas/quality-guardian/](../personas/quality-guardian/): Full role definition (soul & instructions)
 - [architecture.md](architecture.md): How agents fit into the overall system
 - [human-in-the-system.md](human-in-the-system.md): When humans intervene and why
